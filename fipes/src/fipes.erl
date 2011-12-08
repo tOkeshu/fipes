@@ -3,17 +3,18 @@
 
 -export([start/0, start/2, stop/1]).
 
+-define(PUBLIC, [<<"public">>]).
+
 
 start() ->
-    application:start(crypto),
-    application:start(public_key),
-    application:start(ssl),
-    application:start(cowboy),
     application:start(fipes).
 
 
 start(_Type, _Args) ->
-    Routes = [{'_', [{[], fipes_root, []}]}],
+    Routes =
+        [{'_', [cowboy_static:rule([{dir, ?PUBLIC}, {prefix, []}]),
+                cowboy_static:rule([{dir, ?PUBLIC}, {prefix, [<<"static">>]}])
+               ]}],
 
     cowboy:start_listener(http,100,
                           cowboy_tcp_transport, [{port, 8080}],
@@ -25,7 +26,6 @@ start(_Type, _Args) ->
                                                  {keyfile,  "priv/ssl/key.pem"},
                                                  {password, "cowboy"}],
                           cowboy_http_protocol, [{dispatch, Routes}]),
-
     fipes_sup:start_link().
 
 
