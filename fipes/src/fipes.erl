@@ -12,8 +12,8 @@ start() ->
 
 start(_Type, _Args) ->
     Routes =
-        [{'_', [cowboy_static:rule([{dir, ?PUBLIC}, {prefix, []}]),
-                cowboy_static:rule([{dir, ?PUBLIC}, {prefix, [<<"static">>]}])
+        [{'_', [cowboy_static:rule([{dir, ?PUBLIC}, {prefix, [<<"static">>]}]),
+                cowboy_static:rule([{dir, ?PUBLIC}, {prefix, []}])
                ]}],
 
     cowboy:start_listener(http,100,
