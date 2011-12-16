@@ -16,12 +16,13 @@ start(_Type, _Args) ->
                 cowboy_static:rule([{dir, ?PUBLIC}, {prefix, []}])
                ]}],
 
+    {ok, Port} = application:get_env(fipes, port),
     cowboy:start_listener(http,100,
-                          cowboy_tcp_transport, [{port, 8080}],
+                          cowboy_tcp_transport, [{port, Port}],
                           cowboy_http_protocol, [{dispatch, Routes}]
                          ),
     cowboy:start_listener(https, 100,
-                          cowboy_ssl_transport, [{port,     8443},
+                          cowboy_ssl_transport, [{port,     Port + 1},
                                                  {certfile, "priv/ssl/cert.pem"},
                                                  {keyfile,  "priv/ssl/key.pem"},
                                                  {password, "cowboy"}],

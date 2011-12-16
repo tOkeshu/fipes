@@ -12,5 +12,5 @@
 		cowboy
 	]},
 	{mod, {fipes, []}},
-	{env, []}
+	{env, [{port, 3473}]}
 ]}.
