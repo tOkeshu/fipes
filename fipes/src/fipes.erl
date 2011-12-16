@@ -13,6 +13,7 @@ start() ->
 start(_Type, _Args) ->
     Routes =
         [{'_', [cowboy_static:rule([{dir, ?PUBLIC}, {prefix, [<<"static">>]}]),
+                {[<<"fipes">>], fipes_pipe,  []},
                 cowboy_static:rule([{dir, ?PUBLIC}, {prefix, []}])
                ]}],
 

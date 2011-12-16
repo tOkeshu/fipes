@@ -2,6 +2,7 @@
  * Main Fipes JS namespace
  */
 window.App = {
+    Models: {}
 };
 
 App.Router = Backbone.Router.extend({
@@ -15,7 +16,8 @@ App.Router = Backbone.Router.extend({
     },
 
     fipes: function() {
-        console.log('hello fipes!');
+        var fipe = new App.Models.Fipe;
+        fipe.save();
     }
 });
 
@@ -28,9 +30,12 @@ App.Helpers = {};
  * Misc. behaviours, such as global animations, routing...
  */
 $(document).ready(function() {
+    Backbone.sync = Backbone.TNetStrings.sync;
+
     App.Routes = new App.Router;
 
     if (!Backbone.history.start()) {
         App.Routes.navigate('/', true);
     }
 });
+
