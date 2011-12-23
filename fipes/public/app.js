@@ -2,13 +2,15 @@
  * Main Fipes JS namespace
  */
 window.App = {
-    Models: {}
+    Models : {},
+    Views  : {}
 };
 
 App.Router = Backbone.Router.extend({
     routes: {
-        "/"      : "root",
-        "/fipes" : "fipes"
+        "/"            : "root",
+        "/fipes"       : "fipes",
+        "/fipes/:fipe" : "fipe"
     },
 
     root: function() {
@@ -16,8 +18,12 @@ App.Router = Backbone.Router.extend({
     },
 
     fipes: function() {
-        var fipe = new App.Models.Fipe;
-        fipe.save();
+        App.FipeView = new App.Views.Fipe({el: $('#main')});
+    },
+
+    fipe: function(fid) {
+        var fipe = new App.Models.Fipe({id: fid});
+        App.Fipe = fipe;
     }
 });
 
