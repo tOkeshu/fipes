@@ -11,17 +11,28 @@
     <script type="text/javascript" src="/static/app.js"></script>
 
     <script type="text/javascript" src="/static/app/models/fipe.js"></script>
+    <script type="text/javascript" src="/static/app/models/files.js"></script>
 
     <script type="text/javascript" src="/static/app/views/fipe_view.js"></script>
+    <script type="text/javascript" src="/static/app/views/files_view.js"></script>
   </head>
   <body>
     Hello Fipes!
 
     <div id="main">
-      <input type="file"/>
+      <input type="file" multiple="true"/>
       <ul class="files">
       </ul>
     </div>
+
+    <script type="text/html" id="file-template">
+      <article>
+        <header>
+          <h1><%= name %></h1>
+          <p><%= size %></p>
+        </header>
+      </article>
+    </script>
 
   </body>
 </html>

@@ -2,7 +2,30 @@
 
     App.Views.Fipe = Backbone.View.extend({
         events: {
-            'change input[type="file"]': 'redirect'
+            'change input[type="file"]': 'enterTheFipe'
+        },
+
+        enterTheFipe: function(event) {
+            this.addFiles(event);
+
+            // Only redirect when we are on the home page.
+            if (App.Fipe === undefined) {
+                this.redirect();
+            }
+        },
+
+        addFiles: function(event) {
+            var files = event.target.files;
+            files = _.map(files, function(file) {
+                return new App.Models.File({
+                    obj  : file,
+                    name : file.name,
+                    type : file.type,
+                    size : file.size
+                });
+            });
+
+            App.Files.add(files).save();
         },
 
         redirect: function() {
