@@ -22,9 +22,10 @@
     App.Models.File = Backbone.Model.extend({
         toJSON: function() {
             return {
-                name : this.get('name'),
-                type : this.get('type'),
-                size : this.get('size')
+                owner : App.UID,
+                name  : this.get('name'),
+                type  : this.get('type'),
+                size  : this.get('size')
             };
         }
     });

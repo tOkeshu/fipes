@@ -30,6 +30,7 @@ start(_Type, _Args) ->
                                                  {keyfile,  "priv/ssl/key.pem"},
                                                  {password, "cowboy"}],
                           cowboy_http_protocol, [{dispatch, Routes}]),
+    ets:new(files, [set, public, named_table]),
     fipes_sup:start_link().
 
 
