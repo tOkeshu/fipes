@@ -39,16 +39,19 @@ App.Router = Backbone.Router.extend({
         }
 
         var fipe       = new App.Models.Fipe({id: fid});
-        App.Files.fipe = App.Fipe = fipe;
+        fipe.open(function(uid) {
+            App.Files.fipe = App.Fipe = fipe;
+            App.UID        = uid;
 
-        // There is no files yet, sync with the server.
-        if (App.Files.length === 0) {
-            App.Files.fetch();
-        // There is files already, so we save them as we created the
-        // fipe.
-        } else {
-            App.Files.save();
-        }
+            // There is no files yet, sync with the server.
+            if (App.Files.length === 0) {
+                App.Files.fetch();
+            // There is files already, so we save them as we created the
+            // fipe.
+            } else {
+                App.Files.save();
+            }
+        });
     }
 
 });

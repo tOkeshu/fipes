@@ -53,15 +53,27 @@ terminate(_Req, _State) ->
 %% websockets
 
 websocket_init(_Any, Req, []) ->
+    % Send a new uid to the user who opened the fipe.
+    self() ! {uid, uid()},
+
     Req2 = cowboy_http_req:compact(Req),
     {ok, Req2, undefined, hibernate}.
 
 websocket_handle(_Any, Req, State) ->
     {ok, Req, State}.
 
+websocket_info({uid, Uid}, Req, State) ->
+    Event = tnetstrings:encode({struct, [{uid, Uid}]}),
+    {reply, {text, Event}, Req, State, hibernate};
 websocket_info(_Info, Req, State) ->
     {ok, Req, State, hibernate}.
 
 websocket_terminate(_Reason, _Req, _State) ->
     ok.
+
+
+uid() ->
+    {Mega, Sec, Micro} = erlang:now(),
+    Timestamp = (Mega * 1000000 + Sec) * 1000000 + Micro,
+    list_to_binary(integer_to_list(Timestamp, 16)).
 

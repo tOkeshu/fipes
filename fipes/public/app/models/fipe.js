@@ -3,7 +3,7 @@
     App.Models.Fipe = Backbone.Model.extend({
         urlRoot: '/fipes',
 
-        open: function() {
+        open: function(callback) {
             // FIXME: use the line below instead of the ugly
             // one. Before that, you'll need to find how to use
             // websockets with Nginx as a reverse proxy.
@@ -32,6 +32,10 @@
                 console.log("sent message to server: 'hello server'!");
             };
             this.ws.onmessage = function (evt) {
+                var event = tnetstrings.parse(evt.data).value;
+
+                if (callback) callback(event.uid);
+
                 var receivedMsg = evt.data;
                 console.log("server sent the following: '" + receivedMsg + "'");
             };
