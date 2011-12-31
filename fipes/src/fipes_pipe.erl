@@ -59,6 +59,10 @@ websocket_init(_Any, Req, []) ->
     Req2 = cowboy_http_req:compact(Req),
     {ok, Req2, undefined, hibernate}.
 
+websocket_handle({text, Msg}, Req, State) ->
+    Event = tnetstrings:decode(Msg, [{label, atom}]),
+    rpc(Event),
+    {ok, Req, State};
 websocket_handle(_Any, Req, State) ->
     {ok, Req, State}.
 
@@ -78,6 +82,24 @@ websocket_info(_Info, Req, State) ->
     {ok, Req, State, hibernate}.
 
 websocket_terminate(_Reason, _Req, _State) ->
+    ok.
+
+
+rpc({struct, Event2} = Event) ->
+    Type = proplists:get_value(type, Event2),
+    rpc(Type, Event2).
+
+rpc(<<"chunk">>, Event) ->
+    Payload    = proplists:get_value(payload, Event),
+    Uid        = proplists:get_value(downloader, Event),
+
+    [{Uid, Downloader}] = ets:lookup(downloaders, Uid),
+    Downloader ! {chunk, base64:decode(Payload)};
+rpc(<<"eos">>, Event) ->
+    Uid = proplists:get_value(downloader, Event),
+    [{Uid, Downloader}] = ets:lookup(downloaders, Uid),
+    Downloader ! {chunk, eos};
+rpc(_AnyType, Event) ->
     ok.
 
 
