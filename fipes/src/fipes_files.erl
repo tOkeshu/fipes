@@ -39,8 +39,35 @@ index(Fipe, Req) ->
     cowboy_http_req:reply(200, Headers, Results, Req).
 
 
-download(_Fipe, _File, Req) ->
-    cowboy_http_req:reply(405, [], <<"Not Implemented">>, Req).
+download(Fipe, File, Req) ->
+    % Register the downloader
+    Uid = uid(),
+    ets:insert(downloaders, {Uid, self()}),
+
+    % Ask the file owner to start the stream
+    owner(Fipe, File) ! {stream, File, Uid},
+
+    Headers = [{<<"Content-Type">>, <<"application/octet-stream">>}],
+    {ok, Req2} = cowboy_http_req:chunked_reply(200, Headers, Req),
+
+    % TODO: remove the user from the downloader table when finished.
+    stream(Req2).
+
+
+owner(Fipe, File) ->
+    [{{Fipe, File}, {Uid, _FilesInfos}}] = ets:lookup(files, {Fipe, File}),
+    [{Uid, Owner}] = ets:lookup(owners, Uid),
+    Owner.
+
+
+stream(Req) ->
+    receive
+        {chunk, eos} ->
+            {ok, Req};
+        {chunk, Chunk} ->
+            cowboy_http_req:chunk(Chunk, Req),
+            stream(Req)
+    end.
 
 
 create(Fipe, Req) ->
@@ -70,4 +97,11 @@ fid() ->
 
 terminate(_Req, _State) ->
     ok.
+
+
+% XXX: duplicated code, see fipes_pipe:uid/0.
+uid() ->
+    {Mega, Sec, Micro} = erlang:now(),
+    Timestamp = (Mega * 1000000 + Sec) * 1000000 + Micro,
+    list_to_binary(integer_to_list(Timestamp, 16)).
 

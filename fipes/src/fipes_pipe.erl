@@ -62,8 +62,17 @@ websocket_init(_Any, Req, []) ->
 websocket_handle(_Any, Req, State) ->
     {ok, Req, State}.
 
+websocket_info({stream, File, Downloader}, Req, State) ->
+    Event = tnetstrings:encode({struct, [{type, <<"stream">>},
+                                         {file, File},
+                                         {downloader, Downloader}
+                                        ]}),
+    {reply, {text, Event}, Req, State, hibernate};
 websocket_info({uid, Uid}, Req, State) ->
-    Event = tnetstrings:encode({struct, [{uid, Uid}]}),
+    ets:insert(owners, {Uid, self()}),
+    Event = tnetstrings:encode({struct, [{type, <<"uid">>},
+                                         {uid, Uid}
+                                        ]}),
     {reply, {text, Event}, Req, State, hibernate};
 websocket_info(_Info, Req, State) ->
     {ok, Req, State, hibernate}.

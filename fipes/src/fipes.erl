@@ -12,7 +12,8 @@ start() ->
 
 start(_Type, _Args) ->
     Routes =
-        [{'_', [{[<<"fipes">>, pipe, <<"files">>],       fipes_files, []},
+        [{'_', [{[<<"fipes">>, pipe, <<"files">>, file], fipes_files, []},
+                {[<<"fipes">>, pipe, <<"files">>],       fipes_files, []},
                 {[<<"fipes">>, pipe],                    fipes_pipe,  []},
                 {[<<"fipes">>],                          fipes_pipe,  []},
                 cowboy_static:rule([{dir, ?PUBLIC}, {prefix, [<<"static">>]}]),
@@ -30,7 +31,9 @@ start(_Type, _Args) ->
                                                  {keyfile,  "priv/ssl/key.pem"},
                                                  {password, "cowboy"}],
                           cowboy_http_protocol, [{dispatch, Routes}]),
-    ets:new(files, [set, public, named_table]),
+    ets:new(files,       [set, public, named_table]),
+    ets:new(owners,      [set, public, named_table]),
+    ets:new(downloaders, [set, public, named_table]),
     fipes_sup:start_link().
 
 
