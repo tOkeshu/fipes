@@ -28,13 +28,18 @@
                 // websocket is connected
                 console.log("websocket connected!");
                 // send hello data to server.
-                that.ws.send("hello server!");
-                console.log("sent message to server: 'hello server'!");
             };
             this.ws.onmessage = function (evt) {
                 var event = tnetstrings.parse(evt.data).value;
 
-                if (callback) callback(event.uid);
+                switch (event.type) {
+                case "uid":
+                    if (callback) callback(event.uid);
+                    break;
+                case "stream":
+                    that.stream(that.ws, event.file, event.downloader);
+                    break;
+                }
 
                 var receivedMsg = evt.data;
                 console.log("server sent the following: '" + receivedMsg + "'");
@@ -43,7 +48,43 @@
                 // websocket was closed
                 console.log("websocket was closed");
             };
-        }
+        },
+
+        stream: function(ws, fileId, downloader) {
+            var file   = App.Files.get(fileId).get('obj');
+            var reader = new FileReader;
+            var seek   = 0;
+            var slice  = 1024 * 512; // 512 KB
+
+            reader.onload = function(evt) {
+                var data = btoa(evt.target.result);
+                var event = tnetstrings.dump({
+                    type       : "chunk",
+                    payload    : data,
+                    downloader : downloader
+                });
+                ws.send(event);
+
+                seek += slice;
+
+                // Continue to stream the file.
+                if (seek < file.size) {
+                    var blob = file.mozSlice(seek, seek + slice);
+                    reader.readAsBinaryString(blob);
+                // Stop the stream
+                } else {
+                    var eos = tnetstrings.dump({
+                        type: "eos",
+                        downloader: downloader
+                    });
+                    ws.send(eos);
+                }
+            }
+
+            // FIXME: mozSlice? not very portable, isn't it?
+            var blob = file.mozSlice(seek, seek + slice);
+            reader.readAsBinaryString(blob);
+        },
     });
 
 })();
