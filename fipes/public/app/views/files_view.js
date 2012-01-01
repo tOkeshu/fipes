@@ -35,7 +35,11 @@
         },
 
         render: function() {
-            $(this.el).empty().append((this._template())(this.model.toJSON()));
+            var context = _.extend(this.model.toJSON(), {
+                isNew : this.model.isNew(),
+                url   : (App.Fipe) ? this.model.url() : undefined
+            });
+            $(this.el).empty().append((this._template())(context));
             return this;
         },
 

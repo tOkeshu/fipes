@@ -28,7 +28,11 @@
     <script type="text/html" id="file-template">
       <article>
         <header>
-          <h1><%= name %></h1>
+          <% if (isNew) { %>
+            <h1><%= name %></h1>
+          <% } else { %>
+            <h1><a href="<%= url %>" target="_blank"><%= name %></a></h1>
+          <% } %>
           <p><%= size %></p>
         </header>
       </article>
