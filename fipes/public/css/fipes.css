@@ -1,0 +1,91 @@
+/* Fipes.css */
+
+a {
+  text-decoration: none;
+}
+
+#main {
+  padding: 0;
+  border-radius: 10px;
+  margin: 0 auto;
+  width: 600px;
+}
+
+/* Header */
+
+#main > header {
+  padding: 0 13px;
+}
+
+#main > header h1 {
+  text-align: center;
+}
+
+/* Drop Zone */
+
+.dropzone {
+  border: 5px dashed #CCCCCC;
+  border-radius: 10px;
+  height: 150px;
+  width: 500px;
+  margin: 1em auto;
+  color: #CCCCCC;
+  font-family: Helvetica;
+  font-size: 2em;
+  text-align: center;
+}
+
+.dropzone .placeholder {
+  padding: 0;
+  margin-top: 1.5em;
+  margin-bottom: 0.25em;
+}
+
+.dropzone .upload {
+  font-size: 0.5em;
+  margin-top: 0.25em;
+}
+
+.dropzone .upload a {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Files */
+
+.files {
+  width: 500px;
+  margin: 0 auto;
+}
+
+.files ul {
+  padding: 0;
+}
+
+.files ul li {
+  list-style: none;
+  clear: both;
+}
+
+.files header {
+  height: 1em;
+  margin-bottom: 1.5em;
+}
+
+.files h1 {
+  font-size: 1em;
+  margin: 0;
+  float: left;
+}
+
+.files p {
+  float: right;
+  margin: 0;
+}
+
+/* Utils */
+
+.hide {
+  display: none;
+}
+

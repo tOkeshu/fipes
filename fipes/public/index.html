@@ -2,29 +2,51 @@
 <html>
   <head>
     <title>Fipes</title>
+    <!-- Stylesheets -->
+    <link type="text/css" href="/static/css/fipes.css" rel="stylesheet"/>
+
+    <!-- libs -->
     <script type="text/javascript" src="/static/lib/zepto.js"></script>
     <script type="text/javascript" src="/static/lib/underscore.js"></script>
     <script type="text/javascript" src="/static/lib/backbone.js"></script>
     <script type="text/javascript" src="/static/lib/tnetstrings.js"></script>
     <script type="text/javascript" src="/static/lib/backbone-tnetstrings.js"></script>
 
+    <!-- App -->
     <script type="text/javascript" src="/static/app.js"></script>
 
+    <!-- Models -->
     <script type="text/javascript" src="/static/app/models/fipe.js"></script>
     <script type="text/javascript" src="/static/app/models/files.js"></script>
 
+    <!-- Views -->
     <script type="text/javascript" src="/static/app/views/fipe_view.js"></script>
     <script type="text/javascript" src="/static/app/views/files_view.js"></script>
   </head>
-  <body>
-    Hello Fipes!
 
+  <body>
+    <!-- Main wrapper -->
     <div id="main">
-      <input type="file" multiple="true"/>
-      <ul class="files">
-      </ul>
+
+      <header>
+        <h1>Fipes</h1>
+      </header>
+
+      <article>
+        <section class="dropzone">
+          <p class="placeholder">Drag'n drop your files here!</p>
+          <p class="upload">or <a>click here</a> to browse files</p>
+          <input class="hide" type="file" multiple="true"/>
+        </section>
+
+        <section class="files">
+          <ul></ul>
+        <section>
+      </article>
+
     </div>
 
+    <!-- Templates -->
     <script type="text/html" id="file-template">
       <article>
         <header>

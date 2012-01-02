@@ -28,7 +28,7 @@ App.Router = Backbone.Router.extend({
 
         App.FipeView  = new App.Views.Fipe({el: $('#main')});
         App.FilesView = new App.Views.Files({
-            el         : $('#main ul.files'),
+            el         : $('#main .files ul'),
             collection : App.Files
         });
     },
@@ -38,7 +38,7 @@ App.Router = Backbone.Router.extend({
             this.fipes();
         }
 
-        var fipe       = new App.Models.Fipe({id: fid});
+        var fipe = new App.Models.Fipe({id: fid});
         fipe.open(function(uid) {
             App.Files.fipe = App.Fipe = fipe;
             App.UID        = uid;

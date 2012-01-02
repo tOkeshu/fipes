@@ -2,7 +2,14 @@
 
     App.Views.Fipe = Backbone.View.extend({
         events: {
-            'change input[type="file"]': 'enterTheFipe'
+            // Classic file selection
+            'click    .upload a'          : 'browseFiles',
+            'change   input[type="file"]' : 'enterTheFipe'
+        },
+
+        browseFiles: function(event) {
+            var fileInput = $(this.el).find('input[type="file"]')[0];
+            fileInput.click();
         },
 
         enterTheFipe: function(event) {
