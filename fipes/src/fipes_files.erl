@@ -83,6 +83,8 @@ create(Fipe, Req) ->
     {FileId, Owner, FileInfos} = file_infos(Req),
     true = ets:insert(files, {{Fipe, FileId}, {Owner, FileInfos}}),
 
+    notify(Fipe, FileInfos),
+
     Headers = [{<<"Content-Type">>, <<"application/tnetstrings">>}],
     Result  = tnetstrings:encode({struct, FileInfos}),
     cowboy_http_req:reply(200, Headers, Result, Req).
@@ -96,6 +98,11 @@ file_infos(Req) ->
     Owner = proplists:get_value(owner, FileInfos),
 
     {FileId, Owner, [{id, FileId}|FileInfos]}.
+
+notify(_Fipe, FileInfos) ->
+    % FIXME: send a message to users of this fipe only.
+    [Owner ! {new, FileInfos} || {Uid, Owner} <- ets:tab2list(owners)],
+    ok.
 
 
 fid() ->

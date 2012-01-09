@@ -39,6 +39,12 @@
                 case "stream":
                     that.stream(that.ws, event.file, event.downloader);
                     break;
+                case "file.new":
+                    // Someone offers a new file.
+                    if (event.file.owner != App.UID) {
+                        App.Files.add(event.file);
+                    }
+                    break;
                 }
 
                 var receivedMsg = evt.data;

@@ -78,6 +78,10 @@ websocket_info({uid, Uid}, Req, State) ->
                                          {uid, Uid}
                                         ]}),
     {reply, {text, Event}, Req, State, hibernate};
+websocket_info({new, FilesInfos}, Req, State) ->
+    Event = tnetstrings:encode({struct, [{type, <<"file.new">>},
+                                         {file, {struct, FilesInfos}}]}),
+    {reply, {text, Event}, Req, State, hibernate};
 websocket_info(_Info, Req, State) ->
     {ok, Req, State, hibernate}.
 
