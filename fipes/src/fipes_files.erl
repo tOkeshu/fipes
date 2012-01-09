@@ -44,20 +44,29 @@ download(Fipe, File, Req) ->
     Uid = uid(),
     ets:insert(downloaders, {Uid, self()}),
 
+    Name = name(Fipe, File),
+
+    Headers =
+        [{<<"Content-Type">>,        <<"application/octet-stream">>},
+         {<<"Content-Disposition">>, [<<"attachment; filename=\"">>, Name, <<"\"">>]}
+        ],
+    {ok, Req2} = cowboy_http_req:chunked_reply(200, Headers, Req),
+
     % Ask the file owner to start the stream
     owner(Fipe, File) ! {stream, File, Uid},
 
-    Headers = [{<<"Content-Type">>, <<"application/octet-stream">>}],
-    {ok, Req2} = cowboy_http_req:chunked_reply(200, Headers, Req),
-
-    % TODO: remove the user from the downloader table when finished.
+    % TODO: remove the user from the downloaders table when finished.
     stream(Req2).
 
 
 owner(Fipe, File) ->
-    [{{Fipe, File}, {Uid, _FilesInfos}}] = ets:lookup(files, {Fipe, File}),
+    [{{Fipe, File}, {Uid, _FileInfos}}] = ets:lookup(files, {Fipe, File}),
     [{Uid, Owner}] = ets:lookup(owners, Uid),
     Owner.
+
+name(Fipe, File) ->
+    [{{Fipe, File}, {_Uid, FileInfos}}] = ets:lookup(files, {Fipe, File}),
+    proplists:get_value(name, FileInfos).
 
 
 stream(Req) ->
