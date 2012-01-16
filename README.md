@@ -6,7 +6,7 @@ Fipes provides you a simple way to share files with your friends.
 
   - Provides a small web application.
   - Easy to install, easy to launch, easy to use.
-  - Doesn't Keep any data about you or you files.
+  - Doesn't keep any data about you or your files.
 
 ## License
 
