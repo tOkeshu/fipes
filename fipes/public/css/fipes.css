@@ -4,6 +4,11 @@ a {
   text-decoration: none;
 }
 
+body {
+  background-color: #5d94c7;
+  font-family: 'Ruluko', Helvetica;
+}
+
 #main {
   padding: 0;
   border-radius: 10px;
@@ -21,34 +26,46 @@ a {
   text-align: center;
 }
 
-/* Drop Zone */
+/* Upload Widget */
+
+.widget {
+  padding: 20px 20px 15px;
+  border: 1px solid #888888;
+  border-radius: 10px;
+  background-color: #ffffff;
+}
 
 .dropzone {
-  border: 5px dashed #CCCCCC;
+  border: 3px dashed #CCCCCC;
   border-radius: 10px;
-  height: 150px;
-  width: 500px;
-  margin: 1em auto;
-  color: #CCCCCC;
-  font-family: Helvetica;
-  font-size: 2em;
-  text-align: center;
+  height: 94px;
+  width: 520px;
+  margin: 20px auto 15px;
+  color: #888888;
 }
 
 .dropzone .placeholder {
-  padding: 0;
-  margin-top: 1.5em;
-  margin-bottom: 0.25em;
+  padding: 10px 0;
+  margin-top: 23px;
+  margin-left: 40px;
+  font-size: 28px;
+  text-align: center;
+  text-transform: uppercase;
+  background: url('/static/images/picto-document.png') no-repeat 0px 4px transparent;
 }
 
-.dropzone .upload {
-  font-size: 0.5em;
-  margin-top: 0.25em;
+.upload {
+  margin-bottom: 0;
+  margin-left: 20px;
+  padding-left: 16px;
+  font-size: 14px;
+  font-family: Helvetica;
+  background: url('/static/images/picto-upload.png') no-repeat 0px 3px transparent;
 }
 
-.dropzone .upload a {
-  text-decoration: underline;
+.upload a {
   cursor: pointer;
+  color: #4d84b7;
 }
 
 /* Files */

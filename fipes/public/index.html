@@ -2,8 +2,10 @@
 <html>
   <head>
     <title>Fipes</title>
+
     <!-- Stylesheets -->
     <link type="text/css" href="/static/css/fipes.css" rel="stylesheet"/>
+    <link type="text/css" href="http://fonts.googleapis.com/css?family=Ruluko" rel="stylesheet">
 
     <!-- libs -->
     <script type="text/javascript" src="/static/lib/zepto.js"></script>
@@ -25,6 +27,7 @@
   </head>
 
   <body>
+
     <!-- Main wrapper -->
     <div id="main">
 
@@ -33,15 +36,27 @@
       </header>
 
       <article>
-        <section class="dropzone">
-          <p class="placeholder">Drag'n drop your files here!</p>
-          <p class="upload">or <a>click here</a> to browse files</p>
+
+        <!-- Upload Wiget -->
+        <section class="widget">
+
+          <!-- Dropzone -->
+          <div class="dropzone">
+            <p class="placeholder">Drag'n drop your files here!</p>
+          </div>
+
+          <!-- Upload alternative -->
+          <p class="upload"><a>or browse your files</a></p>
+
           <input class="hide" type="file" multiple="true"/>
+
         </section>
 
+        <!-- File list -->
         <section class="files">
           <ul></ul>
         <section>
+
       </article>
 
     </div>
