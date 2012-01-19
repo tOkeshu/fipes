@@ -91,6 +91,10 @@ body {
   color: #4d84b7;
 }
 
+.upload a:hover {
+  text-decoration: underline;
+}
+
 /* Files */
 
 .files ul {
@@ -135,6 +139,34 @@ body {
   font-size: 12px;
   text-align: right;
   text-shadow: 0 1px 1px #888888;
+}
+
+/* Footer */
+
+footer {
+  margin: 40px 0;
+}
+
+footer ul {
+  width: 220px;
+  height: 20px;
+  margin: auto;
+  padding: 0;
+}
+
+footer ul li {
+  list-style: none;
+  float: left;
+  margin: 0 10px;
+}
+
+footer a {
+  color: #ffffff;
+  text-shadow: 0 1px 1px #888888;
+}
+
+footer a:hover {
+  text-decoration: underline;
 }
 
 /* Utils */
