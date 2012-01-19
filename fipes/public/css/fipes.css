@@ -90,34 +90,48 @@ body {
 
 /* Files */
 
-.files {
-  width: 500px;
-  margin: 0 auto;
-}
-
 .files ul {
   padding: 0;
 }
 
 .files ul li {
+  height: 40px;
+  margin-bottom: 10px;
+  padding: 0px 10px 0px 45px;
+  border-radius: 5px;
+  border: 1px solid #366689;
+  box-shadow: 0 0 1px #FFFFFF inset;
   list-style: none;
+  background: url('/static/images/picto-link.png') no-repeat 15px 12px transparent;
+  background-color: #65a2d1;
+  font-family: Helvetica;
   clear: both;
 }
 
-.files header {
-  height: 1em;
-  margin-bottom: 1.5em;
-}
-
 .files h1 {
-  font-size: 1em;
+  height: 30px;
   margin: 0;
+  padding-top: 10px;
+  padding-left: 15px;
+  border-left: 1px solid #366689;
   float: left;
+  font-size: 1em;
 }
 
-.files p {
+.files a {
+  color: #072c4f;
+  text-shadow: 0 1px 1px #CCCCCC;
+  cursor: pointer;
+}
+
+.files .size {
+  min-width: 70px;
+  margin: 12px 0;
+  border-left: 1px solid #366689;
   float: right;
-  margin: 0;
+  font-size: 12px;
+  text-align: right;
+  text-shadow: 0 1px 1px #888888;
 }
 
 /* Utils */
