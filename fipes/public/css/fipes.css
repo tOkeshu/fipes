@@ -7,6 +7,7 @@ a {
 body {
   background-color: #5d94c7;
   font-family: 'Ruluko', Helvetica;
+  color: #ffffff;
 }
 
 #main {
@@ -23,7 +24,16 @@ body {
 }
 
 #main > header h1 {
+  font-size: 64px;
   text-align: center;
+  background: url('/static/images/logo.png') no-repeat 14px 14px transparent;
+  margin-right: auto;
+  margin-left: auto;
+  padding-left: 40px;
+  width: 210px;
+  box-shadow: 0 8px 10px -11px #072C4F;
+  height: 65px;
+  text-shadow: 0 1px 1px #072c4f;
 }
 
 /* Propaganda */
