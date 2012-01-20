@@ -165,6 +165,17 @@ footer p a {
 /* Utils */
 
 .hide {
-  display: none;
+
+  /*
+    We do not use a display:none here because of Chromium.
+    Indeed, Chromium does not allow to trigger a file input if it is
+    not displayed. Thus we are forced to use this dirty hack.
+
+    For more information see this thread:
+
+      http://stackoverflow.com/questions/210643/in-javascript-can-i-make-a-click-event-fire-programmatically-for-a-file-input
+    */
+  visibility: hidden;
+  position:   absolute;
 }
 
