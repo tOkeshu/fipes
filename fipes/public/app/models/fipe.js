@@ -60,6 +60,13 @@
             var seek   = 0;
             var slice  = 1024 * 512; // 512 KB
 
+            // Make a portable slice method.
+            if (file.slice == undefined) {
+                if (file.webkitSlice) var method = file.webkitSlice;
+                if (file.mozSlice) var method = file.mozSlice;
+                file.slice = _.bind(method, file);
+            }
+
             reader.onload = function(evt) {
                 var data = btoa(evt.target.result);
                 var event = tnetstrings.dump({
@@ -73,7 +80,7 @@
 
                 // Continue to stream the file.
                 if (seek < file.size) {
-                    var blob = file.mozSlice(seek, seek + slice);
+                    var blob = file.slice(seek, seek + slice);
                     reader.readAsBinaryString(blob);
                 // Stop the stream
                 } else {
@@ -85,8 +92,7 @@
                 }
             }
 
-            // FIXME: mozSlice? not very portable, isn't it?
-            var blob = file.mozSlice(seek, seek + slice);
+            var blob = file.slice(seek, seek + slice);
             reader.readAsBinaryString(blob);
         },
     });
