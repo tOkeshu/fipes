@@ -153,25 +153,13 @@ footer {
   margin: 40px 0;
 }
 
-footer ul {
-  width: 220px;
-  height: 20px;
-  margin: auto;
-  padding: 0;
-}
-
-footer ul li {
-  list-style: none;
-  float: left;
-  margin: 0 10px;
-}
-
-footer a {
-  color: #ffffff;
+footer p {
   text-shadow: 0 1px 1px #888888;
+  text-align: center
 }
 
-footer a:hover {
+footer p a {
+  color: #ffffff;
   text-decoration: underline;
 }
 
