@@ -5,16 +5,16 @@ a {
 }
 
 body {
-  background: url('/static/images/background.png');
+  background:  url('/static/images/background.png');
+  color:       #ffffff;
   font-family: 'Ruluko', Helvetica;
-  color: #ffffff;
 }
 
 #main {
-  padding: 0;
   border-radius: 10px;
-  margin: 0 auto;
-  width: 600px;
+  margin:        0 auto;
+  padding:       0;
+  width:         600px;
 }
 
 /* Header */
@@ -24,77 +24,77 @@ body {
 }
 
 #main > header h1 {
-  font-size: 64px;
-  text-align: center;
-  background: url('/static/images/logo.png') no-repeat 14px 14px transparent;
+  background:   url('/static/images/logo.png') no-repeat 14px 14px transparent;
+  box-shadow:   0 8px 10px -11px #072C4F;
+  font-size:    64px;
+  height:       65px;
+  margin-left:  auto;
   margin-right: auto;
-  margin-left: auto;
   padding-left: 40px;
-  width: 210px;
-  box-shadow: 0 8px 10px -11px #072C4F;
-  height: 65px;
-  text-shadow: 0 1px 1px #072c4f;
+  text-align:   center;
+  text-shadow:  0 1px 1px #072c4f;
+  width:        210px;
 }
 
 /* Propaganda */
 
 .propaganda {
-  margin: auto;
-  font-size: 38px;
-  text-align: center;
+  color:          #072c4f;
+  font-size:      38px;
+  margin:         auto;
+  text-align:     center;
+  text-shadow:    0 1px 2px #888888;
   text-transform: uppercase;
-  text-shadow: 0 1px 2px #888888;
-  color: #072c4f;
 }
 
 .propaganda em {
-  font-style: normal;
+  font-style:  normal;
   font-weight: bold;
 }
 
 /* Upload Widget */
 
 .widget {
-  display: block;
-  margin-bottom: 20px;
-  padding: 20px 20px 15px;
-  border: 1px solid #888888;
-  border-radius: 10px;
   background-color: #ffffff;
-  box-shadow: 0 0 5px #888888 inset;
+  border-radius:    10px;
+  border:           1px solid #888888;
+  box-shadow:       0 0 5px #888888 inset;
+  display:          block;
+  margin-bottom:    20px;
+  padding:          20px 20px 15px;
 }
 
 .dropzone {
-  border: 3px dashed #CCCCCC;
   border-radius: 10px;
-  height: 94px;
-  width: 520px;
-  margin: 20px auto 15px;
-  color: #888888;
+  border:        3px dashed #CCCCCC;
+  color:         #888888;
+  height:        94px;
+  margin:        20px auto 15px;
+  width:         520px;
 }
 
 .dropzone .placeholder {
-  padding: 10px 0;
-  margin-top: 23px;
-  margin-left: 40px;
-  font-size: 28px;
-  text-align: center;
+  background:     url('/static/images/picto-document.png') no-repeat 0px 4px transparent;
+  font-size:      28px;
+  margin-left:    40px;
+  margin-top:     23px;
+  padding:        10px 0;
+  text-align:     center;
   text-transform: uppercase;
-  background: url('/static/images/picto-document.png') no-repeat 0px 4px transparent;
 }
 
 .upload {
   margin-bottom: 0;
-  margin-left: 20px;
-  padding-left: 16px;
-  font-size: 14px;
-  font-family: Helvetica;
-  background: url('/static/images/picto-upload.png') no-repeat 0px 3px transparent;
+  margin-left:   20px;
+  padding-left:  16px;
+  font-size:     14px;
+  font-family:   Helvetica;
+  background:    url('/static/images/picto-upload.png') no-repeat 0px 3px transparent;
 }
 
 .upload a {
+  color:  #4d84b7;
   cursor: pointer;
-  color: #4d84b7;
 }
 
 .upload a:hover {
@@ -108,42 +108,41 @@ body {
 }
 
 .files ul li {
-  height: 40px;
-  margin-bottom: 10px;
-  padding: 0px 10px 0px 45px;
-  border-radius: 5px;
-  border: 1px solid #366689;
-  box-shadow: 0 0 1px #FFFFFF inset;
-  list-style: none;
-  background: url('/static/images/picto-link.png') no-repeat 15px 12px transparent;
-  background-color: #65a2d1;
-  font-family: Helvetica;
-  clear: both;
+  background:       url('/static/images/picto-link.png') no-repeat 15px 12px #65a2d1;
+  border-radius:    5px;
+  border:           1px solid #366689;
+  box-shadow:       0 0 1px #FFFFFF inset;
+  clear:            both;
+  font-family:      Helvetica;
+  height:           40px;
+  list-style:       none;
+  margin-bottom:    10px;
+  padding:          0px 10px 0px 45px;
 }
 
 .files h1 {
-  height: 30px;
-  margin: 0;
-  padding-top: 10px;
+  border-left:  1px solid #366689;
+  float:        left;
+  font-size:    16px;
+  height:       30px;
+  margin:       0;
   padding-left: 15px;
-  border-left: 1px solid #366689;
-  float: left;
-  font-size: 1em;
+  padding-top:  10px;
 }
 
 .files a {
-  color: #072c4f;
+  color:       #072c4f;
+  cursor:      pointer;
   text-shadow: 0 1px 1px #CCCCCC;
-  cursor: pointer;
 }
 
 .files .size {
-  min-width: 70px;
-  margin: 12px 0;
   border-left: 1px solid #366689;
-  float: right;
-  font-size: 12px;
-  text-align: right;
+  float:       right;
+  font-size:   12px;
+  margin:      12px 0;
+  min-width:   70px;
+  text-align:  right;
   text-shadow: 0 1px 1px #888888;
 }
 
@@ -155,11 +154,11 @@ footer {
 
 footer p {
   text-shadow: 0 1px 1px #888888;
-  text-align: center
+  text-align:  center
 }
 
 footer p a {
-  color: #ffffff;
+  color:           #ffffff;
   text-decoration: underline;
 }
 
