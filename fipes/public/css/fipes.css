@@ -5,7 +5,7 @@ a {
 }
 
 body {
-  background-color: #5d94c7;
+  background: url('/static/images/background.png');
   font-family: 'Ruluko', Helvetica;
   color: #ffffff;
 }
