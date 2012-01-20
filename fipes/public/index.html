@@ -2,8 +2,10 @@
 <html>
   <head>
     <title>Fipes</title>
+
     <!-- Stylesheets -->
     <link type="text/css" href="/static/css/fipes.css" rel="stylesheet"/>
+    <link type="text/css" href="http://fonts.googleapis.com/css?family=Ruluko" rel="stylesheet">
 
     <!-- libs -->
     <script type="text/javascript" src="/static/lib/zepto.js"></script>
@@ -25,6 +27,7 @@
   </head>
 
   <body>
+
     <!-- Main wrapper -->
     <div id="main">
 
@@ -33,31 +36,55 @@
       </header>
 
       <article>
-        <section class="dropzone">
-          <p class="placeholder">Drag'n drop your files here!</p>
-          <p class="upload">or <a>click here</a> to browse files</p>
-          <input class="hide" type="file" multiple="true"/>
+
+        <!-- Marketing bullshit (not so, of course) -->
+        <section class="propaganda">
+          <p>Fipes is an <em>easy</em> way to share files with your <em>friends</em></p>
+          <p><img src="/static/images/banner-smiley.png"/></p>
         </section>
 
+        <!-- Upload Wiget -->
+        <section class="widget">
+
+          <!-- Dropzone -->
+          <div class="dropzone">
+            <p class="placeholder">Drag'n drop your files here!</p>
+          </div>
+
+          <!-- Upload alternative -->
+          <p class="upload"><a>or browse your files</a></p>
+
+          <input class="hide" type="file" multiple="true"/>
+
+        </section>
+
+        <!-- File list -->
         <section class="files">
           <ul></ul>
         <section>
+
       </article>
+
+      <footer>
+        <p>
+          <a href="http://github.com/rgauthier/fipes">Code</a> by
+          <a href="http://monkeypatch.me/~rgauthier/">@tOkeshu</a>,
+          design by <a href="http://artographik.fr/">@EtienneLe2may</a>.
+        </p>
+      </footer>
 
     </div>
 
     <!-- Templates -->
     <script type="text/html" id="file-template">
-      <article>
-        <header>
-          <% if (isNew) { %>
-            <h1><%= name %></h1>
-          <% } else { %>
-            <h1><a href="<%= url %>" target="_blank"><%= name %></a></h1>
-          <% } %>
-          <p><%= size %></p>
-        </header>
-      </article>
+      <div>
+        <% if (isNew) { %>
+          <h1><%= name %></h1>
+        <% } else { %>
+          <h1><a href="<%= url %>" target="_blank"><%= name %></a></h1>
+        <% } %>
+        <p class="byte size"><%= App.Helpers.humanSize(size) %></p>
+      </div>
     </script>
 
   </body>

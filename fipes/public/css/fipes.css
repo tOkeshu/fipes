@@ -4,11 +4,17 @@ a {
   text-decoration: none;
 }
 
+body {
+  background:  url('/static/images/background.png');
+  color:       #ffffff;
+  font-family: 'Ruluko', Helvetica;
+}
+
 #main {
-  padding: 0;
   border-radius: 10px;
-  margin: 0 auto;
-  width: 600px;
+  margin:        0 auto;
+  padding:       0;
+  width:         600px;
 }
 
 /* Header */
@@ -18,69 +24,142 @@ a {
 }
 
 #main > header h1 {
-  text-align: center;
+  background:   url('/static/images/logo.png') no-repeat 14px 14px transparent;
+  box-shadow:   0 8px 10px -11px #072C4F;
+  font-size:    64px;
+  height:       65px;
+  margin-left:  auto;
+  margin-right: auto;
+  padding-left: 40px;
+  text-align:   center;
+  text-shadow:  0 1px 1px #072c4f;
+  width:        210px;
 }
 
-/* Drop Zone */
+/* Propaganda */
+
+.propaganda {
+  color:          #072c4f;
+  font-size:      38px;
+  margin:         auto;
+  text-align:     center;
+  text-shadow:    0 1px 2px #888888;
+  text-transform: uppercase;
+}
+
+.propaganda em {
+  font-style:  normal;
+  font-weight: bold;
+}
+
+/* Upload Widget */
+
+.widget {
+  background-color: #ffffff;
+  border-radius:    10px;
+  border:           1px solid #888888;
+  box-shadow:       0 0 5px #888888 inset;
+  display:          block;
+  margin-bottom:    20px;
+  padding:          20px 20px 15px;
+}
 
 .dropzone {
-  border: 5px dashed #CCCCCC;
   border-radius: 10px;
-  height: 150px;
-  width: 500px;
-  margin: 1em auto;
-  color: #CCCCCC;
-  font-family: Helvetica;
-  font-size: 2em;
-  text-align: center;
+  border:        3px dashed #CCCCCC;
+  color:         #888888;
+  height:        94px;
+  margin:        20px auto 15px;
+  width:         520px;
 }
 
 .dropzone .placeholder {
-  padding: 0;
-  margin-top: 1.5em;
-  margin-bottom: 0.25em;
+  background:     url('/static/images/picto-document.png') no-repeat 0px 4px transparent;
+  font-size:      28px;
+  margin-left:    40px;
+  margin-top:     23px;
+  padding:        10px 0;
+  text-align:     center;
+  text-transform: uppercase;
 }
 
-.dropzone .upload {
-  font-size: 0.5em;
-  margin-top: 0.25em;
+.upload {
+  margin-bottom: 0;
+  margin-left:   20px;
+  padding-left:  16px;
+  font-size:     14px;
+  font-family:   Helvetica;
+  background:    url('/static/images/picto-upload.png') no-repeat 0px 3px transparent;
 }
 
-.dropzone .upload a {
-  text-decoration: underline;
+.upload a {
+  color:  #4d84b7;
   cursor: pointer;
 }
 
-/* Files */
-
-.files {
-  width: 500px;
-  margin: 0 auto;
+.upload a:hover {
+  text-decoration: underline;
 }
+
+/* Files */
 
 .files ul {
   padding: 0;
 }
 
 .files ul li {
-  list-style: none;
-  clear: both;
-}
-
-.files header {
-  height: 1em;
-  margin-bottom: 1.5em;
+  background:       url('/static/images/picto-link.png') no-repeat 15px 12px #65a2d1;
+  border-radius:    5px;
+  border:           1px solid #366689;
+  box-shadow:       0 0 1px #FFFFFF inset;
+  clear:            both;
+  font-family:      Helvetica;
+  height:           40px;
+  list-style:       none;
+  margin-bottom:    10px;
+  padding:          0px 10px 0px 45px;
 }
 
 .files h1 {
-  font-size: 1em;
-  margin: 0;
-  float: left;
+  border-left:  1px solid #366689;
+  float:        left;
+  font-size:    16px;
+  height:       30px;
+  margin:       0;
+  padding-left: 15px;
+  padding-top:  10px;
 }
 
-.files p {
-  float: right;
-  margin: 0;
+.files a {
+  color:       #072c4f;
+  cursor:      pointer;
+  text-shadow: 0 1px 1px #CCCCCC;
+}
+
+.files .size {
+  border-left: 1px solid #366689;
+  float:       right;
+  font-size:   12px;
+  margin:      12px 0;
+  min-width:   70px;
+  text-align:  right;
+  text-shadow: 0 1px 1px #888888;
+}
+
+/* Footer */
+
+footer {
+  margin: 40px 0;
+}
+
+footer p {
+  text-shadow: 0 1px 1px #888888;
+  text-align:  center
+}
+
+footer p a {
+  color:           #ffffff;
+  text-decoration: underline;
 }
 
 /* Utils */

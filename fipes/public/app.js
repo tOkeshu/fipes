@@ -59,7 +59,24 @@ App.Router = Backbone.Router.extend({
 /**
  * Helpers. Highly dangerous stuff.
  */
-App.Helpers = {};
+App.Helpers = {
+
+    // Return a human readable format for size (in bytes).
+    // Found here:
+    //
+    //   http://programanddesign.com/js/human-readable-file-size-in-javascript/
+    //
+    humanSize: function(size) {
+        var units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        var i = 0;
+        while(size >= 1024) {
+            size /= 1024;
+            ++i;
+        }
+        return size.toFixed(1) + ' ' + units[i];
+    }
+
+};
 
 /**
  * Misc. behaviours, such as global animations, routing...
