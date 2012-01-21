@@ -42,7 +42,7 @@ index(Fipe, Req) ->
 download(Fipe, File, Req) ->
     % Register the downloader
     Uid = uid(),
-    ets:insert(downloaders, {Uid, self()}),
+    ets:insert(downloaders, {{Fipe, Uid}, self()}),
 
     Name = name(Fipe, File),
 

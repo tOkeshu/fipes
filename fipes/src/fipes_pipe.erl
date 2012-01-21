@@ -60,10 +60,10 @@ websocket_init(_Any, Req, []) ->
     Req2 = cowboy_http_req:compact(Req),
     {ok, Req2, Fipe, hibernate}.
 
-websocket_handle({text, Msg}, Req, State) ->
+websocket_handle({text, Msg}, Req, Fipe) ->
     Event = tnetstrings:decode(Msg, [{label, atom}]),
-    rpc(Event),
-    {ok, Req, State};
+    rpc(Fipe, Event),
+    {ok, Req, Fipe};
 websocket_handle(_Any, Req, State) ->
     {ok, Req, State}.
 
@@ -90,21 +90,21 @@ websocket_terminate(_Reason, _Req, _State) ->
     ok.
 
 
-rpc({struct, Event2} = Event) ->
+rpc(Fipe, {struct, Event2} = Event) ->
     Type = proplists:get_value(type, Event2),
-    rpc(Type, Event2).
+    rpc(Fipe, Type, Event2).
 
-rpc(<<"chunk">>, Event) ->
+rpc(Fipe, <<"chunk">>, Event) ->
     Payload    = proplists:get_value(payload, Event),
     Uid        = proplists:get_value(downloader, Event),
 
-    [{Uid, Downloader}] = ets:lookup(downloaders, Uid),
+    [{{Fipe, Uid}, Downloader}] = ets:lookup(downloaders, {Fipe, Uid}),
     Downloader ! {chunk, base64:decode(Payload)};
-rpc(<<"eos">>, Event) ->
+rpc(Fipe, <<"eos">>, Event) ->
     Uid = proplists:get_value(downloader, Event),
-    [{Uid, Downloader}] = ets:lookup(downloaders, Uid),
+    [{{Fipe, Uid}, Downloader}] = ets:lookup(downloaders, {Fipe, Uid}),
     Downloader ! {chunk, eos};
-rpc(_AnyType, Event) ->
+rpc(_Fipe, _AnyType, _Event) ->
     ok.
 
 
