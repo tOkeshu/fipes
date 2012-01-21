@@ -55,8 +55,7 @@ download(Fipe, File, Req) ->
     % Ask the file owner to start the stream
     owner(Fipe, File) ! {stream, File, Uid},
 
-    % TODO: remove the user from the downloaders table when finished.
-    stream(Req2).
+    stream(Fipe, Uid, Req2).
 
 
 owner(Fipe, File) ->
@@ -69,13 +68,14 @@ name(Fipe, File) ->
     proplists:get_value(name, FileInfos).
 
 
-stream(Req) ->
+stream(Fipe, Uid, Req) ->
     receive
         {chunk, eos} ->
+            ets:delete(downloaders, {Fipe, Uid}),
             {ok, Req};
         {chunk, Chunk} ->
             cowboy_http_req:chunk(Chunk, Req),
-            stream(Req)
+            stream(Fipe, Uid, Req)
     end.
 
 
