@@ -11,19 +11,17 @@ body {
 }
 
 #main {
-  border-radius: 10px;
   margin:        0 auto;
-  padding:       0;
   width:         600px;
 }
 
 /* Header */
 
-#main > header {
+header {
   padding: 0 13px;
 }
 
-#main > header h1 {
+header h1 {
   background:   url('/static/images/logo.png') no-repeat 14px 14px transparent;
   box-shadow:   0 8px 10px -11px #072C4F;
   font-size:    64px;
@@ -34,6 +32,10 @@ body {
   text-align:   center;
   text-shadow:  0 1px 1px #072c4f;
   width:        210px;
+}
+
+header h1 a {
+  color: #ffffff;
 }
 
 /* Propaganda */
