@@ -43,7 +43,8 @@ fail(Req) ->
 
 create(Req) ->
     Headers = [{<<"Content-Type">>, <<"application/tnetstrings">>}],
-    cowboy_http_req:reply(200, Headers, <<"19:2:id,10:1234567890,}">>, Req).
+    Result  = tnetstrings:encode({struct, [{id, uid()}]}),
+    cowboy_http_req:reply(200, Headers, Result, Req).
 
 
 
