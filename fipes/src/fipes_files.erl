@@ -61,7 +61,7 @@ download(Fipe, File, Req) ->
 
 owner(Fipe, File) ->
     [{{Fipe, File}, {Uid, _FileInfos}}] = ets:lookup(files, {Fipe, File}),
-    [{Uid, Owner}] = ets:lookup(owners, Uid),
+    [{{Fipe, Uid}, Owner}] = ets:lookup(owners, {Fipe, Uid}),
     Owner.
 
 name(Fipe, File) ->
@@ -99,9 +99,8 @@ file_infos(Req) ->
 
     {FileId, Owner, [{id, FileId}|FileInfos]}.
 
-notify(_Fipe, FileInfos) ->
-    % FIXME: send a message to users of this fipe only.
-    [Owner ! {new, FileInfos} || {Uid, Owner} <- ets:tab2list(owners)],
+notify(Fipe, FileInfos) ->
+    [Owner ! {new, FileInfos} || {{Fipe, Uid}, Owner} <- ets:tab2list(owners)],
     ok.
 
 

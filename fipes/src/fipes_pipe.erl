@@ -56,8 +56,9 @@ websocket_init(_Any, Req, []) ->
     % Send a new uid to the user who opened the fipe.
     self() ! {uid, uid()},
 
+    {Fipe, Req} = cowboy_http_req:binding(pipe, Req),
     Req2 = cowboy_http_req:compact(Req),
-    {ok, Req2, undefined, hibernate}.
+    {ok, Req2, Fipe, hibernate}.
 
 websocket_handle({text, Msg}, Req, State) ->
     Event = tnetstrings:decode(Msg, [{label, atom}]),
@@ -72,12 +73,12 @@ websocket_info({stream, File, Downloader}, Req, State) ->
                                          {downloader, Downloader}
                                         ]}),
     {reply, {text, Event}, Req, State, hibernate};
-websocket_info({uid, Uid}, Req, State) ->
-    ets:insert(owners, {Uid, self()}),
+websocket_info({uid, Uid}, Req, Fipe) ->
+    ets:insert(owners, {{Fipe, Uid}, self()}),
     Event = tnetstrings:encode({struct, [{type, <<"uid">>},
                                          {uid, Uid}
                                         ]}),
-    {reply, {text, Event}, Req, State, hibernate};
+    {reply, {text, Event}, Req, Fipe, hibernate};
 websocket_info({new, FilesInfos}, Req, State) ->
     Event = tnetstrings:encode({struct, [{type, <<"file.new">>},
                                          {file, {struct, FilesInfos}}]}),
