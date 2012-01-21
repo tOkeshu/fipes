@@ -43,6 +43,13 @@
                         App.Files.add(event.file);
                     }
                     break;
+                case "file.remove":
+                    // Someone removed a file.
+                    if (event.file.owner != App.UID) {
+                        var file = App.Files.get(event.file.id);
+                        App.Files.remove(file);
+                    }
+                    break;
                 }
 
                 var receivedMsg = evt.data;

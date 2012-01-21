@@ -42,7 +42,7 @@ index(Fipe, Req) ->
 download(Fipe, File, Req) ->
     % Register the downloader
     Uid = uid(),
-    ets:insert(downloaders, {Uid, self()}),
+    ets:insert(downloaders, {{Fipe, Uid}, self()}),
 
     Name = name(Fipe, File),
 
@@ -55,13 +55,12 @@ download(Fipe, File, Req) ->
     % Ask the file owner to start the stream
     owner(Fipe, File) ! {stream, File, Uid},
 
-    % TODO: remove the user from the downloaders table when finished.
-    stream(Req2).
+    stream(Fipe, Uid, Req2).
 
 
 owner(Fipe, File) ->
     [{{Fipe, File}, {Uid, _FileInfos}}] = ets:lookup(files, {Fipe, File}),
-    [{Uid, Owner}] = ets:lookup(owners, Uid),
+    [{{Fipe, Uid}, Owner}] = ets:lookup(owners, {Fipe, Uid}),
     Owner.
 
 name(Fipe, File) ->
@@ -69,13 +68,14 @@ name(Fipe, File) ->
     proplists:get_value(name, FileInfos).
 
 
-stream(Req) ->
+stream(Fipe, Uid, Req) ->
     receive
         {chunk, eos} ->
+            ets:delete(downloaders, {Fipe, Uid}),
             {ok, Req};
         {chunk, Chunk} ->
             cowboy_http_req:chunk(Chunk, Req),
-            stream(Req)
+            stream(Fipe, Uid, Req)
     end.
 
 
@@ -99,9 +99,8 @@ file_infos(Req) ->
 
     {FileId, Owner, [{id, FileId}|FileInfos]}.
 
-notify(_Fipe, FileInfos) ->
-    % FIXME: send a message to users of this fipe only.
-    [Owner ! {new, FileInfos} || {Uid, Owner} <- ets:tab2list(owners)],
+notify(Fipe, FileInfos) ->
+    [Owner ! {new, FileInfos} || {{Fipe, Uid}, Owner} <- ets:tab2list(owners)],
     ok.
 
 

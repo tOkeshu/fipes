@@ -43,7 +43,8 @@ fail(Req) ->
 
 create(Req) ->
     Headers = [{<<"Content-Type">>, <<"application/tnetstrings">>}],
-    cowboy_http_req:reply(200, Headers, <<"19:2:id,10:1234567890,}">>, Req).
+    Result  = tnetstrings:encode({struct, [{id, uid()}]}),
+    cowboy_http_req:reply(200, Headers, Result, Req).
 
 
 
@@ -56,13 +57,14 @@ websocket_init(_Any, Req, []) ->
     % Send a new uid to the user who opened the fipe.
     self() ! {uid, uid()},
 
+    {Fipe, Req} = cowboy_http_req:binding(pipe, Req),
     Req2 = cowboy_http_req:compact(Req),
-    {ok, Req2, undefined, hibernate}.
+    {ok, Req2, [Fipe, undefined], hibernate}.
 
-websocket_handle({text, Msg}, Req, State) ->
+websocket_handle({text, Msg}, Req, [Fipe, _Uid]) ->
     Event = tnetstrings:decode(Msg, [{label, atom}]),
-    rpc(Event),
-    {ok, Req, State};
+    rpc(Fipe, Event),
+    {ok, Req, [Fipe, _Uid]};
 websocket_handle(_Any, Req, State) ->
     {ok, Req, State}.
 
@@ -72,38 +74,55 @@ websocket_info({stream, File, Downloader}, Req, State) ->
                                          {downloader, Downloader}
                                         ]}),
     {reply, {text, Event}, Req, State, hibernate};
-websocket_info({uid, Uid}, Req, State) ->
-    ets:insert(owners, {Uid, self()}),
+websocket_info({uid, Uid}, Req, [Fipe, undefined]) ->
+    ets:insert(owners, {{Fipe, Uid}, self()}),
     Event = tnetstrings:encode({struct, [{type, <<"uid">>},
                                          {uid, Uid}
                                         ]}),
-    {reply, {text, Event}, Req, State, hibernate};
+    {reply, {text, Event}, Req, [Fipe, Uid], hibernate};
 websocket_info({new, FilesInfos}, Req, State) ->
     Event = tnetstrings:encode({struct, [{type, <<"file.new">>},
+                                         {file, {struct, FilesInfos}}]}),
+    {reply, {text, Event}, Req, State, hibernate};
+websocket_info({remove, FilesInfos}, Req, State) ->
+    Event = tnetstrings:encode({struct, [{type, <<"file.remove">>},
                                          {file, {struct, FilesInfos}}]}),
     {reply, {text, Event}, Req, State, hibernate};
 websocket_info(_Info, Req, State) ->
     {ok, Req, State, hibernate}.
 
-websocket_terminate(_Reason, _Req, _State) ->
+websocket_terminate(_Reason, _Req, [Fipe, Uid]) ->
+    % Find the user's files
+    Files = ets:match_object(files, {{Fipe, '_'}, {Uid, '_'}}),
+    [begin
+         notify(Fipe, FileInfos),
+         ets:delete(files, {Fipe, FileId})
+     end || {{Fipe, FileId}, {Owner, FileInfos}} <- Files],
+    ets:delete(owners, {Fipe, Uid}),
     ok.
 
 
-rpc({struct, Event2} = Event) ->
-    Type = proplists:get_value(type, Event2),
-    rpc(Type, Event2).
+% XXX: duplicated code, see fipes_files:notify/2.
+notify(Fipe, FileInfos) ->
+    [Owner ! {remove, FileInfos} || {{Fipe, Uid}, Owner} <- ets:tab2list(owners)],
+    ok.
 
-rpc(<<"chunk">>, Event) ->
+
+rpc(Fipe, {struct, Event2} = Event) ->
+    Type = proplists:get_value(type, Event2),
+    rpc(Fipe, Type, Event2).
+
+rpc(Fipe, <<"chunk">>, Event) ->
     Payload    = proplists:get_value(payload, Event),
     Uid        = proplists:get_value(downloader, Event),
 
-    [{Uid, Downloader}] = ets:lookup(downloaders, Uid),
+    [{{Fipe, Uid}, Downloader}] = ets:lookup(downloaders, {Fipe, Uid}),
     Downloader ! {chunk, base64:decode(Payload)};
-rpc(<<"eos">>, Event) ->
+rpc(Fipe, <<"eos">>, Event) ->
     Uid = proplists:get_value(downloader, Event),
-    [{Uid, Downloader}] = ets:lookup(downloaders, Uid),
+    [{{Fipe, Uid}, Downloader}] = ets:lookup(downloaders, {Fipe, Uid}),
     Downloader ! {chunk, eos};
-rpc(_AnyType, Event) ->
+rpc(_Fipe, _AnyType, _Event) ->
     ok.
 
 
