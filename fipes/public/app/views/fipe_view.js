@@ -4,7 +4,10 @@
         events: {
             // Classic file selection
             'click    .upload a'          : 'browseFiles',
-            'change   input[type="file"]' : 'enterTheFipe'
+            'change   input[type="file"]' : 'enterTheFipe',
+            // Drag'n drop
+            'dragover .widget'            : 'dragOver',
+            'drop     .widget'            : 'drop'
         },
 
         browseFiles: function(event) {
@@ -13,7 +16,7 @@
         },
 
         enterTheFipe: function(event) {
-            this.addFiles(event);
+            this.addFiles(event.target.files);
 
             // Only redirect when we are on the home page.
             if (App.Fipe === undefined) {
@@ -21,8 +24,15 @@
             }
         },
 
-        addFiles: function(event) {
-            var files = event.target.files;
+        dragOver: function(event) {
+            return false;
+        },
+
+        drop: function(event) {
+            this.addFiles(event.dataTransfer.files);
+        },
+
+        addFiles: function(files) {
             files = _.map(files, function(file) {
                 return new App.Models.File({
                     obj  : file,
