@@ -4,10 +4,10 @@
         events: {
             // Classic file selection
             'click    .upload a'          : 'browseFiles',
-            'change   input[type="file"]' : 'enterTheFipe',
+            'change   input[type="file"]' : 'selectFiles',
             // Drag'n drop
             'dragover .widget'            : 'dragOver',
-            'drop     .widget'            : 'drop'
+            'drop     .widget'            : 'dropFiles'
         },
 
         browseFiles: function(event) {
@@ -15,21 +15,25 @@
             fileInput.click();
         },
 
-        enterTheFipe: function(event) {
-            this.addFiles(event.target.files);
-
-            // Only redirect when we are on the home page.
-            if (App.Fipe === undefined) {
-                this.redirect();
-            }
+        selectFiles: function(event) {
+            this.enterTheFipe(event.target.files);
         },
 
         dragOver: function(event) {
             return false;
         },
 
-        drop: function(event) {
-            this.addFiles(event.dataTransfer.files);
+        dropFiles: function(event) {
+            this.enterTheFipe(event.dataTransfer.files);
+        },
+
+        enterTheFipe: function(files) {
+            this.addFiles(files);
+
+            // Only redirect when we are on the home page.
+            if (App.Fipe === undefined) {
+                this.redirect();
+            }
         },
 
         addFiles: function(files) {
