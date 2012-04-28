@@ -16,8 +16,12 @@ start(_Type, _Args) ->
                 {[<<"fipes">>, pipe, <<"files">>],       fipes_files, []},
                 {[<<"fipes">>, pipe],                    fipes_pipe,  []},
                 {[<<"fipes">>],                          fipes_pipe,  []},
-                cowboy_static:rule([{dir, ?PUBLIC}, {prefix, [<<"static">>]}]),
-                cowboy_static:rule([{dir, ?PUBLIC}, {prefix, []}])
+                {[<<"static">>, '...'],                  cowboy_http_static,
+                 [{directory, ?PUBLIC},
+                  {mimetypes, {fun mimetypes:path_to_mimes/2, default}}]},
+                {['...'],                                cowboy_http_static,
+                 [{directory, ?PUBLIC},
+                  {mimetypes, {fun mimetypes:path_to_mimes/2, default}}]}
                ]}],
 
     {ok, Port} = application:get_env(fipes, port),
