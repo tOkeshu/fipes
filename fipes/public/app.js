@@ -88,5 +88,23 @@ $(document).ready(function() {
     if (!Backbone.history.start()) {
         App.Routes.navigate('/', true);
     }
+
+    window.onbeforeunload = function (event) {
+        if (App.Files == undefined || App.Files.size() == 0) {
+            return;
+        }
+
+        var message = 'If you quit this page, the files you offer will not be available anymore.';
+        var event = event || window.event;
+
+        // For IE and Firefox prior to version 4
+        if (event) {
+            event.returnValue = message;
+        }
+
+        // For Safari
+        return message;
+    };
+
 });
 
