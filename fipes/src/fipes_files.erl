@@ -48,7 +48,10 @@ download(Fipe, File, Req) ->
 
     Headers =
         [{<<"Content-Type">>,        <<"application/octet-stream">>},
-         {<<"Content-Disposition">>, [<<"attachment; filename=\"">>, Name, <<"\"">>]}
+         {<<"Content-Disposition">>, [<<"attachment; filename=\"">>, Name, <<"\"">>]},
+         % Says to Nginx to not buffer this response
+         % http://wiki.nginx.org/X-accel#X-Accel-Buffering
+         {<<"X-Accel-Buffering">>,   <<"no">>}
         ],
     {ok, Req2} = cowboy_http_req:chunked_reply(200, Headers, Req),
 
