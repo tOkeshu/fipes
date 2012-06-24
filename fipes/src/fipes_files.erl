@@ -56,9 +56,10 @@ download(Fipe, File, Req) ->
     {ok, Req2} = cowboy_http_req:chunked_reply(200, Headers, Req),
 
     % Ask the file owner to start the stream
-    owner(Fipe, File) ! {stream, File, Uid},
+    Owner = owner(Fipe, File),
+    Owner ! {stream, File, Uid, 0},
 
-    stream(Fipe, Uid, Req2).
+    stream(Fipe, File, Owner, Uid, 0, Req2).
 
 
 owner(Fipe, File) ->
@@ -71,14 +72,15 @@ name(Fipe, File) ->
     proplists:get_value(name, FileInfos).
 
 
-stream(Fipe, Uid, Req) ->
+stream(Fipe, File, Owner, Uid, Seek, Req) ->
     receive
         {chunk, eos} ->
             ets:delete(downloaders, {Fipe, Uid}),
             {ok, Req};
         {chunk, Chunk} ->
             cowboy_http_req:chunk(Chunk, Req),
-            stream(Fipe, Uid, Req)
+            Owner ! {stream, File, Uid, Seek + size(Chunk)},
+            stream(Fipe, File, Owner, Uid, Seek + size(Chunk), Req)
     end.
 
 
