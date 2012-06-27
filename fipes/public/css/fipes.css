@@ -110,7 +110,7 @@ header h1 a {
 }
 
 .files ul li {
-  background:       url('/static/images/picto-link.png') no-repeat 15px 12px #65a2d1;
+  position: relative;
   border-radius:    5px;
   border:           1px solid #366689;
   box-shadow:       0 0 1px #FFFFFF inset;
@@ -120,6 +120,12 @@ header h1 a {
   list-style:       none;
   margin-bottom:    10px;
   padding:          0px 10px 0px 45px;
+}
+
+.files img {
+	position: absolute;
+	left: 14px;
+	top: 12px;
 }
 
 .files h1 {
