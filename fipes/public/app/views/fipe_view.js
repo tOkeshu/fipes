@@ -3,11 +3,12 @@
     App.Views.Fipe = Backbone.View.extend({
         events: {
             // Classic file selection
-            'click    .upload a'          : 'browseFiles',
-            'change   input[type="file"]' : 'selectFiles',
+            'click     .upload a'          : 'browseFiles',
+            'change    input[type="file"]' : 'selectFiles',
             // Drag'n drop
-            'dragover .widget'            : 'dragOver',
-            'drop     .widget'            : 'dropFiles'
+            'dragleave .widget'            : 'dragLeave',
+            'dragover  .widget'            : 'dragOver',
+            'drop      .widget'            : 'dropFiles'
         },
 
         browseFiles: function(event) {
@@ -19,11 +20,17 @@
             this.enterTheFipe(event.target.files);
         },
 
+        dragLeave: function(event) {
+			$(this.el).find('.dropzone').css({'background-color': '#fff', 'border-color': '#ccc' });
+        },
+
         dragOver: function(event) {
+			$(this.el).find('.dropzone').css({'background-color': '#73ddaa', 'border-color': '#888'});
             return false;
         },
 
         dropFiles: function(event) {
+			$(this.el).find('.dropzone').animate({'background-color': '#fff', 'border-color': '#ccc' });
             this.enterTheFipe(event.dataTransfer.files);
         },
 
