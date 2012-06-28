@@ -68,10 +68,11 @@ websocket_handle({text, Msg}, Req, [Fipe, _Uid]) ->
 websocket_handle(_Any, Req, State) ->
     {ok, Req, State}.
 
-websocket_info({stream, File, Downloader}, Req, State) ->
+websocket_info({stream, File, Downloader, Seek}, Req, State) ->
     Event = tnetstrings:encode({struct, [{type, <<"stream">>},
                                          {file, File},
-                                         {downloader, Downloader}
+                                         {downloader, Downloader},
+                                         {seek, Seek}
                                         ]}),
     {reply, {text, Event}, Req, State, hibernate};
 websocket_info({uid, Uid}, Req, [Fipe, undefined]) ->

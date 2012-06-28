@@ -56,9 +56,10 @@ download(Fipe, File, Req) ->
     {ok, Req2} = cowboy_http_req:chunked_reply(200, Headers, Req),
 
     % Ask the file owner to start the stream
-    owner(Fipe, File) ! {stream, File, Uid},
+    Owner = owner(Fipe, File),
+    Owner ! {stream, File, Uid, 0},
 
-    stream(Fipe, Uid, Req2).
+    stream(Fipe, File, Owner, Uid, Req2).
 
 
 owner(Fipe, File) ->
@@ -71,14 +72,34 @@ name(Fipe, File) ->
     proplists:get_value(name, FileInfos).
 
 
-stream(Fipe, Uid, Req) ->
+stream(Fipe, File, Owner, Uid, Req) ->
     receive
         {chunk, eos} ->
             ets:delete(downloaders, {Fipe, Uid}),
             {ok, Req};
-        {chunk, Chunk} ->
-            cowboy_http_req:chunk(Chunk, Req),
-            stream(Fipe, Uid, Req)
+        {chunk, FirstChunk} ->
+            <<SmallChunk:1/binary, NextCurrentChunk/binary>> = FirstChunk,
+            cowboy_http_req:chunk(SmallChunk, Req),
+            NextSeek = size(FirstChunk),
+            Owner ! {stream, File, Uid, NextSeek},
+            stream(Fipe, File, Owner, Uid, NextCurrentChunk, NextSeek, Req)
+    end.
+stream(Fipe, File, Owner, Uid, CurrentChunk, Seek, Req) ->
+    receive
+        {chunk, eos} ->
+            cowboy_http_req:chunk(CurrentChunk, Req),
+            ets:delete(downloaders, {Fipe, Uid}),
+            {ok, Req};
+        {chunk, NextChunk} ->
+            cowboy_http_req:chunk(CurrentChunk, Req),
+            NextSeek = Seek + size(NextChunk),
+            Owner ! {stream, File, Uid, NextSeek},
+            stream(Fipe, File, Owner, Uid, NextChunk, NextSeek, Req)
+    after
+        20000 ->
+            <<SmallChunk:1/binary, NexCurrentChunk/binary>> = CurrentChunk,
+            cowboy_http_req:chunk(SmallChunk, Req),
+            stream(Fipe, File, Owner, Uid, NexCurrentChunk, Seek, Req)
     end.
 
 

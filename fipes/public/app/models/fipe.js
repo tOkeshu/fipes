@@ -35,7 +35,7 @@
                     if (callback) callback(event.uid);
                     break;
                 case "stream":
-                    that.stream(that.ws, event.file, event.downloader);
+                    that.stream(that.ws, event);
                     break;
                 case "file.new":
                     // Someone offers a new file.
@@ -61,10 +61,10 @@
             };
         },
 
-        stream: function(ws, fileId, downloader) {
-            var file   = App.Files.get(fileId).get('obj');
+        stream: function(ws, e) {
+            var file   = App.Files.get(e.file).get('obj');
             var reader = new FileReader;
-            var seek   = 0;
+            var seek   = e.seek;
             var slice  = 1024 * 512; // 512 KB
 
             // Make a portable slice method.
@@ -79,28 +79,23 @@
                 var event = tnetstrings.dump({
                     type       : "chunk",
                     payload    : data,
-                    downloader : downloader
+                    downloader : e.downloader
                 });
                 ws.send(event);
-
-                seek += slice;
-
-                // Continue to stream the file.
-                if (seek < file.size) {
-                    var blob = file.slice(seek, seek + slice);
-                    reader.readAsBinaryString(blob);
-                // Stop the stream
-                } else {
-                    var eos = tnetstrings.dump({
-                        type: "eos",
-                        downloader: downloader
-                    });
-                    ws.send(eos);
-                }
             }
 
-            var blob = file.slice(seek, seek + slice);
-            reader.readAsBinaryString(blob);
+            // Stream the file
+            if (seek < file.size) {
+                var blob = file.slice(seek, seek + slice);
+                reader.readAsBinaryString(blob);
+            // Stop the stream
+            } else {
+                var eos = tnetstrings.dump({
+                    type: "eos",
+                    downloader: e.downloader
+                });
+                ws.send(eos);
+            }
         },
     });
 
