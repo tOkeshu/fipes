@@ -37,7 +37,7 @@
         render: function() {
             var context = _.extend(this.model.toJSON(), {
                 isNew : this.model.isNew(),
-                url   : (App.Fipe) ? document.location.protocol + '//' + document.domain + this.model.url() : undefined
+                url   : (App.Fipe) ? this.model.fullUrl() : undefined
             });
             $(this.el).empty().append((this._template())(context));
             return this;

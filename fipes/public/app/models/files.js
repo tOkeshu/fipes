@@ -20,6 +20,11 @@
     });
 
     App.Models.File = Backbone.Model.extend({
+
+        fullUrl: function() {
+            return document.location.protocol + '//' + document.domain + this.url();
+        },
+
         toJSON: function() {
             return {
                 owner : App.UID,
