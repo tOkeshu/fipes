@@ -114,6 +114,7 @@ header h1 a {
 }
 
 .files ul li > div {
+  background-color: #65a2d1;
   position: relative;
   border-radius:    5px;
   border:           1px solid #366689;
