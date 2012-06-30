@@ -18,7 +18,7 @@ Fipes provides you a simple way to share files with your friends.
 
 ### Install the project
 
-    $ git clone git://github.com/rgauthier/fipes.git
+    $ git clone https://github.com/tOkeshu/fipes.git
     $ cd fipes
     $ make app
 
@@ -51,6 +51,11 @@ Here is a sample configuration for nginx:
                proxy_pass http://127.0.0.1:3473/static/;
         }
     }
+
+Enable your site:
+
+    $ sudo ln -s /etc/nginx/sites-available/fipes.example.com /etc/nginx/sites-enabled/fipes.example.com
+    $ sudo /etc/init.d/nginx reload
 
 ### Start the server
 
