@@ -32,6 +32,7 @@
         dropFiles: function(event) {
             $(this.el).find('.dropzone').removeClass('active');
             this.enterTheFipe(event.dataTransfer.files);
+            return false;
         },
 
         enterTheFipe: function(files) {
