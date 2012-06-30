@@ -21,16 +21,16 @@
         },
 
         dragLeave: function(event) {
-			$(this.el).find('.dropzone').css({'background-color': '#fff', 'border-color': '#ccc' });
+            $(this.el).find('.dropzone').css({'background-color': '#fff', 'border-color': '#ccc' });
         },
 
         dragOver: function(event) {
-			$(this.el).find('.dropzone').css({'background-color': '#73ddaa', 'border-color': '#888'});
+            $(this.el).find('.dropzone').css({'background-color': '#73ddaa', 'border-color': '#888'});
             return false;
         },
 
         dropFiles: function(event) {
-			$(this.el).find('.dropzone').animate({'background-color': '#fff', 'border-color': '#ccc' });
+            $(this.el).find('.dropzone').animate({'background-color': '#fff', 'border-color': '#ccc' });
             this.enterTheFipe(event.dataTransfer.files);
         },
 
