@@ -3,7 +3,7 @@
     App.Views.Fipe = Backbone.View.extend({
         events: {
             // Classic file selection
-            'click     .upload a'          : 'browseFiles',
+            'click     .widget'          : 'browseFiles',
             'change    input[type="file"]' : 'selectFiles',
             // Drag'n drop
             'dragleave .widget'            : 'dragLeave',
