@@ -136,23 +136,23 @@ body {
   border-left:      1px solid #366689;
   box-shadow:       0 0 5px #888888 inset;
   font-family:      Helvetica;
-  height:           30px;
   padding:          10px;
   clear:            both;
 }
 
 .files p.url {
-  margin: auto;
-  width: 450px;
+  margin:        auto;
+  margin-bottom: 20px;
+  width:         450px;
 }
 
 .files p.url input {
-  color: #000;
-  width: 100%;
-  border: 0;
+  color:            #000;
+  width:            100%;
+  border:           0;
   background-color: transparent;
-  padding-top: 4px;
-  font-family: monospace;
+  padding-top:      4px;
+  font-family:      monospace;
 }
 
 .files h1 {
@@ -179,6 +179,79 @@ body {
   min-width:   70px;
   text-align:  right;
   text-shadow: 0 1px 1px #888888;
+}
+
+.files .progress {
+  background-color: #F7F7F7;
+  background-image: -moz-linear-gradient(center top , #F5F5F5, #F9F9F9);
+  border-radius:    10px 10px 10px 10px;
+  box-shadow:       0 0 1px #888888 inset;
+  height:           10px;
+  width:            500px;
+  margin-left:      auto;
+  margin-right:     auto;
+  margin-bottom:    18px;
+  padding:          2px;
+  overflow:         hidden;
+}
+
+@-webkit-keyframes progress-bar-stripes {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 40px 0;
+  }
+}
+
+@-moz-keyframes progress-bar-stripes {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 40px 0;
+  }
+}
+
+@-ms-keyframes progress-bar-stripes {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 40px 0;
+  }
+}
+
+@-o-keyframes progress-bar-stripes {
+  from {
+    background-position: 40px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@keyframes progress-bar-stripes {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 40px 0;
+  }
+}
+
+.files .bar {
+  -moz-animation:   2s linear 0s normal none infinite progress-bar-stripes;
+  background-color: #62C462;
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-size:  40px 40px;
+  height:           10px;
+
+  border-radius:    10px 10px 10px 10px;
+}
+
+.uploads li {
+  margin-bottom: 20px;
 }
 
 /* Footer */
