@@ -78,24 +78,18 @@
     <!-- Templates -->
     <script type="text/html" id="file-template">
       <% if (isNew) { %>
-        <div class="loading">
-          <div>
-            <img alt="It seems to bug..." width="18" height="18" src="/static/images/spinner.gif">
-            <h1><%= _.escape(name) %></h1>
-            <p class="byte size"><%= App.Helpers.humanSize(size) %></p>
-          </div>
-        </div>
+        <header class="loading">
+          <h1><%= _.escape(name) %></h1>
+          <p class="byte size"><%= App.Helpers.humanSize(size) %></p>
+        </header>
       <% } else { %>
-        <div class="ready">
-          <div>
-            <img alt="Ready to share!" width="18" height="18" src="/static/images/picto-link.png">
-            <h1><a href="<%= url %>" target="_blank"><%= _.escape(name) %></a></h1>
-            <p class="byte size"><%= App.Helpers.humanSize(size) %></p>
-          </div>
-          <div class="details">
-            <p class="url"><input readonly="readonly" type="text" value="<%= url %>"></p>
-          </div>
-        </div>
+        <header>
+          <h1><a href="<%= url %>" target="_blank"><%= _.escape(name) %></a></h1>
+          <p class="byte size"><%= App.Helpers.humanSize(size) %></p>
+        </header>
+        <section class="details">
+          <p class="url"><input readonly="readonly" type="text" value="<%= url %>"></p>
+        </section>
       <% } %>
     </script>
   </body>

@@ -17,11 +17,11 @@ body {
 
 /* Header */
 
-header {
+#main > header {
   padding: 0 13px;
 }
 
-header h1 {
+#main > header h1 {
   background:   url('/static/images/logo.png') no-repeat 14px 14px transparent;
   box-shadow:   0 8px 10px -11px #072C4F;
   font-size:    64px;
@@ -34,7 +34,7 @@ header h1 {
   width:        210px;
 }
 
-header h1 a {
+#main > header h1 a {
   color: #ffffff;
 }
 
@@ -117,37 +117,33 @@ header h1 a {
   list-style:       none;
 }
 
-.files ul li > div {
-  background-color: #65a2d1;
-  position: relative;
-  border-radius:    5px;
+.files ul li > header {
+  background:       url('/static/images/picto-link.png') no-repeat 15px 12px #65a2d1;
+  border-radius:    5px 5px 0px 0px;
   border:           1px solid #366689;
   box-shadow:       0 0 1px #FFFFFF inset;
-  clear:            both;
   font-family:      Helvetica;
-  height:           70px;
-  list-style:       none;
-  margin-bottom:    10px;
-  padding:          0px 10px 0px 45px;
-}
-
-.files ul li > div.loading {
   height:           40px;
+  padding:          0px 10px 0px 45px;
+  clear:            both;
 }
 
-.files img {
-  position: absolute;
-  left: 14px;
-  top: 12px;
-}
-
-.files div.details {
-  clear: both;
+.files section.details {
+  background-color: #e8eff4;
+  border-radius:    0px 0px 5px 5px;
+  border-right:     1px solid #366689;
+  border-bottom:    1px solid #366689;
+  border-left:      1px solid #366689;
+  box-shadow:       0 0 5px #888888 inset;
+  font-family:      Helvetica;
+  height:           30px;
+  padding:          10px;
+  clear:            both;
 }
 
 .files p.url {
-  margin-left: -36px;
-  border-top: 1px solid #366689;
+  margin: auto;
+  width: 450px;
 }
 
 .files p.url input {
