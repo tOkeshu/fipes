@@ -5,6 +5,7 @@
         initialize: function() {
             this.collection.bind('add', _.bind(this.render, this));
             this.collection.bind('remove', _.bind(this.render, this));
+            this.collection.bind('reset', _.bind(this.render, this));
         },
 
         // XXX: Maybe split this function into several ones.

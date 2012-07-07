@@ -1,24 +1,5 @@
 (function() {
 
-    App.Models.Files = Backbone.Collection.extend({
-        model: App.Models.File,
-
-        url: function() {
-            // TODO: throw a comprehensive error when the fipe was not
-            // attached.
-            return this.fipe.url() + '/files';
-        },
-
-        save: function() {
-            // Save files, only when there is an attached fipe.
-            if (this.fipe) {
-                this.each(function(file) {
-                    if (file.isNew()) file.save();
-                });
-            }
-        }
-    });
-
     App.Models.File = Backbone.Model.extend({
 
         initialize: function() {
@@ -89,6 +70,25 @@
             }
         }
 
+    });
+
+    App.Models.Files = Backbone.Collection.extend({
+        model: App.Models.File,
+
+        url: function() {
+            // TODO: throw a comprehensive error when the fipe was not
+            // attached.
+            return this.fipe.url() + '/files';
+        },
+
+        save: function() {
+            // Save files, only when there is an attached fipe.
+            if (this.fipe) {
+                this.each(function(file) {
+                    if (file.isNew()) file.save();
+                });
+            }
+        }
     });
 
 })();
