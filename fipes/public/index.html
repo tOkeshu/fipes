@@ -20,10 +20,12 @@
     <!-- Models -->
     <script type="text/javascript" src="/static/app/models/fipe.js"></script>
     <script type="text/javascript" src="/static/app/models/files.js"></script>
+    <script type="text/javascript" src="/static/app/models/uploads.js"></script>
 
     <!-- Views -->
     <script type="text/javascript" src="/static/app/views/fipe_view.js"></script>
     <script type="text/javascript" src="/static/app/views/files_view.js"></script>
+    <script type="text/javascript" src="/static/app/views/uploads_view.js"></script>
   </head>
 
   <body>
@@ -93,6 +95,13 @@
         </section>
       <% } %>
     </script>
+
+    <script type="text/html" id="upload-template">
+      <div class="progress">
+        <div style="width: <%= progress %>%" class="bar"></div>
+      </div>
+    </script>
+
   </body>
 </html>
 
