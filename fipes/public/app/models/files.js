@@ -21,6 +21,10 @@
 
     App.Models.File = Backbone.Model.extend({
 
+        initialize: function() {
+            this.uploads = new App.Models.Uploads;
+        },
+
         fullUrl: function() {
             return document.location.protocol + '//' + document.domain + this.url();
         },
@@ -57,6 +61,16 @@
                 });
                 ws.send(event);
 
+                var upload = that.uploads.get(e.downloader);
+                if (upload) {
+                    upload.set({seek: seek});
+                } else {
+                    that.uploads.add({
+                        id: e.downloader,
+                        seek: seek,
+                        size: file.size
+                    });
+                }
             }
 
             // Stream the file
@@ -70,6 +84,8 @@
                     downloader: e.downloader
                 });
                 ws.send(eos);
+                var upload = that.uploads.get(e.downloader);
+                upload.set({seek: file.size});
             }
         }
 

@@ -40,6 +40,8 @@
                 url   : (App.Fipe) ? this.model.fullUrl() : undefined
             });
             $(this.el).empty().append((this._template())(context));
+            var view = new App.Views.Uploads({collection: this.model.uploads, el: $(this.el).find('.uploads')})
+            view.render();
             return this;
         },
 
