@@ -3,7 +3,8 @@
     App.Views.Files = Backbone.View.extend({
 
         initialize: function() {
-            this.collection.bind('all', _.bind(this.render, this));
+            this.collection.bind('add', _.bind(this.render, this));
+            this.collection.bind('remove', _.bind(this.render, this));
         },
 
         // XXX: Maybe split this function into several ones.

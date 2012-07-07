@@ -114,6 +114,7 @@ body {
 }
 
 .files ul li {
+  margin-bottom:    20px;
   list-style:       none;
 }
 
@@ -242,16 +243,13 @@ body {
 
 .files .bar {
   -moz-animation:   2s linear 0s normal none infinite progress-bar-stripes;
+  -moz-transition: width 0.6s ease 0s;
   background-color: #62C462;
   background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
   background-size:  40px 40px;
   height:           10px;
 
   border-radius:    10px 10px 10px 10px;
-}
-
-.uploads li {
-  margin-bottom: 20px;
 }
 
 /* Footer */
