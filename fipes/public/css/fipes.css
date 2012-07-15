@@ -11,17 +11,17 @@ body {
 }
 
 #main {
-  margin:        0 auto;
-  width:         600px;
+  margin: 0 auto;
+  width:  600px;
 }
 
 /* Header */
 
-header {
+#main > header {
   padding: 0 13px;
 }
 
-header h1 {
+#main > header h1 {
   background:   url('/static/images/logo.png') no-repeat 14px 14px transparent;
   box-shadow:   0 8px 10px -11px #072C4F;
   font-size:    64px;
@@ -34,7 +34,7 @@ header h1 {
   width:        210px;
 }
 
-header h1 a {
+#main > header h1 a {
   color: #ffffff;
 }
 
@@ -114,49 +114,46 @@ header h1 a {
 }
 
 .files ul li {
+  margin-bottom:    20px;
   list-style:       none;
 }
 
-.files ul li > div {
-  background-color: #65a2d1;
-  position: relative;
-  border-radius:    5px;
+.files ul li > header {
+  background:       url('/static/images/picto-link.png') no-repeat 15px 12px #65a2d1;
+  border-radius:    5px 5px 0px 0px;
   border:           1px solid #366689;
   box-shadow:       0 0 1px #FFFFFF inset;
-  clear:            both;
   font-family:      Helvetica;
-  height:           70px;
-  list-style:       none;
-  margin-bottom:    10px;
-  padding:          0px 10px 0px 45px;
-}
-
-.files ul li > div.loading {
   height:           40px;
+  padding:          0px 10px 0px 45px;
+  clear:            both;
 }
 
-.files img {
-  position: absolute;
-  left: 14px;
-  top: 12px;
-}
-
-.files div.details {
-  clear: both;
+.files section.details {
+  background-color: #e8eff4;
+  border-radius:    0px 0px 5px 5px;
+  border-right:     1px solid #366689;
+  border-bottom:    1px solid #366689;
+  border-left:      1px solid #366689;
+  box-shadow:       0 0 5px #888888 inset;
+  font-family:      Helvetica;
+  padding:          10px;
+  clear:            both;
 }
 
 .files p.url {
-  margin-left: -36px;
-  border-top: 1px solid #366689;
+  margin:        auto;
+  margin-bottom: 20px;
+  width:         450px;
 }
 
 .files p.url input {
-  color: #000;
-  width: 100%;
-  border: 0;
+  color:            #000;
+  width:            100%;
+  border:           0;
   background-color: transparent;
-  padding-top: 4px;
-  font-family: monospace;
+  padding-top:      4px;
+  font-family:      monospace;
 }
 
 .files h1 {
@@ -185,6 +182,96 @@ header h1 a {
   text-shadow: 0 1px 1px #888888;
 }
 
+.files .progress {
+  background-color: #F7F7F7;
+  border-radius:    10px 10px 10px 10px;
+  box-shadow:       0 0 1px #888888 inset;
+  height:           10px;
+  width:            500px;
+  margin-left:      auto;
+  margin-right:     auto;
+  margin-bottom:    18px;
+  padding:          2px;
+  overflow:         hidden;
+
+  background-image: -webkit-linear-gradient(center top , #F5F5F5, #F9F9F9);
+  background-image: -moz-linear-gradient(center top , #F5F5F5, #F9F9F9);
+  background-image: -ms-linear-gradient(center top , #F5F5F5, #F9F9F9);
+  background-image: -o-linear-gradient(center top , #F5F5F5, #F9F9F9);
+  background-image: linear-gradient(center top , #F5F5F5, #F9F9F9);
+}
+
+@-webkit-keyframes progress-bar-stripes {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 40px 0;
+  }
+}
+
+@-moz-keyframes progress-bar-stripes {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 40px 0;
+  }
+}
+
+@-ms-keyframes progress-bar-stripes {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 40px 0;
+  }
+}
+
+@-o-keyframes progress-bar-stripes {
+  from {
+    background-position: 40px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@keyframes progress-bar-stripes {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 40px 0;
+  }
+}
+
+.files .bar {
+  background-color:   #62C462;
+  background-size:    40px 40px;
+  height:             10px;
+  border-radius:      10px 10px 10px 10px;
+
+  -webkit-animation:  progress-bar-stripes 2s linear 0s normal none infinite;
+  -moz-animation:     progress-bar-stripes 2s linear 0s normal none infinite;
+  -ms-animation:      progress-bar-stripes 2s linear 0s normal none infinite;
+  -o-animation:       progress-bar-stripes 2s linear 0s normal none infinite;
+  animation:          progress-bar-stripes 2s linear 0s normal none infinite;
+
+  -webkit-transition: width 0.6s ease 0s;
+  -moz-transition:    width 0.6s ease 0s;
+  -ms-transition:     width 0.6s ease 0s;
+  -o-transition:      width 0.6s ease 0s;
+  transition:         width 0.6s ease 0s;
+
+  background-image:   -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image:   -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image:   -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image:   -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image:   linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+
+}
+
 /* Footer */
 
 footer {
@@ -204,7 +291,6 @@ footer p a {
 /* Utils */
 
 .hide {
-
   /*
     We do not use a display:none here because of Chromium.
     Indeed, Chromium does not allow to trigger a file input if it is
