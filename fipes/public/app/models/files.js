@@ -1,5 +1,21 @@
 (function() {
 
+    App.Models.File = Backbone.Model.extend({
+
+        fullUrl: function() {
+            return document.location.protocol + '//' + document.domain + this.url();
+        },
+
+        toJSON: function() {
+            return {
+                owner : App.UID,
+                name  : this.get('name'),
+                type  : this.get('type'),
+                size  : this.get('size')
+            };
+        }
+    });
+
     App.Models.Files = Backbone.Collection.extend({
         model: App.Models.File,
 
@@ -16,22 +32,6 @@
                     if (file.isNew()) file.save();
                 });
             }
-        }
-    });
-
-    App.Models.File = Backbone.Model.extend({
-
-        fullUrl: function() {
-            return document.location.protocol + '//' + document.domain + this.url();
-        },
-
-        toJSON: function() {
-            return {
-                owner : App.UID,
-                name  : this.get('name'),
-                type  : this.get('type'),
-                size  : this.get('size')
-            };
         }
     });
 
