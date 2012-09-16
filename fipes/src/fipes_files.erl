@@ -124,7 +124,8 @@ file_infos(Req) ->
     {FileId, Owner, [{id, FileId}|FileInfos]}.
 
 notify(Fipe, FileInfos) ->
-    [Owner ! {new, FileInfos} || {{Fipe, Uid}, Owner} <- ets:tab2list(owners)],
+    [Owner ! {new, FileInfos} ||
+        {{OtherFipe, Uid}, Owner} <- ets:tab2list(owners), OtherFipe == Fipe],
     ok.
 
 
