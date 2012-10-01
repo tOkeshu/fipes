@@ -3,7 +3,9 @@
     App.Views.Files = Backbone.View.extend({
 
         initialize: function() {
-            this.collection.bind('all', _.bind(this.render, this));
+            this.collection.bind('add', _.bind(this.render, this));
+            this.collection.bind('remove', _.bind(this.render, this));
+            this.collection.bind('reset', _.bind(this.render, this));
         },
 
         // XXX: Maybe split this function into several ones.
@@ -40,6 +42,8 @@
                 url   : (App.Fipe) ? this.model.fullUrl() : undefined
             });
             $(this.el).empty().append((this._template())(context));
+            var view = new App.Views.Uploads({collection: this.model.uploads, el: $(this.el).find('.uploads')})
+            view.render();
             return this;
         },
 
