@@ -278,12 +278,23 @@ footer {
   margin: 40px 0;
 }
 
-footer p {
+footer .social {
+  width: 210px;
+  margin-left:  auto;
+  margin-right: auto;
+  padding: 0;
+}
+
+footer .social a {
+  margin-right: 20px;
+}
+
+footer .links {
   text-shadow: 0 1px 1px #888888;
   text-align:  center
 }
 
-footer p a {
+footer .links a {
   color:           #ffffff;
   text-decoration: underline;
 }
