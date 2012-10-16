@@ -33,11 +33,11 @@ fail(Req) ->
     case cowboy_http_req:binding(pipe, Req) of
         %% /fipes => 405 Method Not Allowed
         {undefined, Req2} ->
-            cowboy_http_req:reply(405, [], <<"">>, Req);
+            cowboy_http_req:reply(405, [], <<"">>, Req2);
         %% /fipes/:fipe => Only supports websockets
         {_Pipe, Req2} ->
             Message = <<"This resource supports websockets only.">>,
-            cowboy_http_req:reply(400, [], Message, Req)
+            cowboy_http_req:reply(400, [], Message, Req2)
     end.
 
 
@@ -98,20 +98,22 @@ websocket_terminate(_Reason, _Req, [Fipe, Uid]) ->
     [begin
          notify(Fipe, FileInfos),
          ets:delete(files, {Fipe, FileId})
-     end || {{Fipe, FileId}, {Owner, FileInfos}} <- Files],
+     end || {{_Fipe, FileId}, {_Owner, FileInfos}} <- Files],
     ets:delete(owners, {Fipe, Uid}),
     ok.
 
 
 % XXX: duplicated code, see fipes_files:notify/2.
 notify(Fipe, FileInfos) ->
-    [Owner ! {remove, FileInfos} || {{Fipe, Uid}, Owner} <- ets:tab2list(owners)],
+    [Owner ! {remove, FileInfos} ||
+        {{OtherFipe, _Uid}, Owner} <- ets:tab2list(owners), OtherFipe == Fipe],
     ok.
 
 
-rpc(Fipe, {struct, Event2} = Event) ->
-    Type = proplists:get_value(type, Event2),
-    rpc(Fipe, Type, Event2).
+
+rpc(Fipe, {struct, Event}) ->
+    Type = proplists:get_value(type, Event),
+    rpc(Fipe, Type, Event).
 
 rpc(Fipe, <<"chunk">>, Event) ->
     Payload    = proplists:get_value(payload, Event),
