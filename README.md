@@ -45,6 +45,7 @@ Here is a sample configuration for nginx:
 
         location /fipes {
                proxy_pass http://127.0.0.1:3473/fipes;
+               proxy_read_timeout 900;
         }
 
         location /static/ {
