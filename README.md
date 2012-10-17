@@ -85,6 +85,9 @@ your `/etc/hosts`:
 
   * For now, anyone can enter a Fipe.
 
+  * [Fipelines.org](http://fipelines.org) does not support https yet
+    (you have been warned!).
+
 ## What about the name
 
 Fipes is a [Portmanteau](http://en.wikipedia.org/wiki/Portmanteau)
