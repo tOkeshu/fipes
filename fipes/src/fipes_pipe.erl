@@ -43,7 +43,7 @@ fail(Req) ->
 
 create(Req) ->
     Headers = [{<<"Content-Type">>, <<"application/tnetstrings">>}],
-    Result  = tnetstrings:encode({struct, [{id, uid()}]}),
+    Result  = tnetstrings:encode({struct, [{id, fipes_utils:token(10)}]}),
     cowboy_http_req:reply(200, Headers, Result, Req).
 
 
@@ -55,7 +55,7 @@ terminate(_Req, _State) ->
 
 websocket_init(_Any, Req, []) ->
     % Send a new uid to the user who opened the fipe.
-    self() ! {uid, uid()},
+    self() ! {uid, fipes_utils:token(8)},
 
     {Fipe, Req} = cowboy_http_req:binding(pipe, Req),
     Req2 = cowboy_http_req:compact(Req),
@@ -127,10 +127,4 @@ rpc(Fipe, <<"eos">>, Event) ->
     Downloader ! {chunk, eos};
 rpc(_Fipe, _AnyType, _Event) ->
     ok.
-
-
-uid() ->
-    {Mega, Sec, Micro} = erlang:now(),
-    Timestamp = (Mega * 1000000 + Sec) * 1000000 + Micro,
-    list_to_binary(integer_to_list(Timestamp, 16)).
 

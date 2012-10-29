@@ -41,7 +41,7 @@ index(Fipe, Req) ->
 
 download(Fipe, File, Req) ->
     % Register the downloader
-    Uid = uid(),
+    Uid = fipes_utils:token(8),
     ets:insert(downloaders, {{Fipe, Uid}, self()}),
 
     Name = name(Fipe, File),
@@ -115,7 +115,7 @@ create(Fipe, Req) ->
 
 
 file_infos(Req) ->
-    FileId = fid(),
+    FileId = fipes_utils:token(2),
 
     {ok, Body, Req2} = cowboy_http_req:body(Req),
     {struct, FileInfos} = tnetstrings:decode(Body, [{label, atom}]),
@@ -129,19 +129,6 @@ notify(Fipe, FileInfos) ->
     ok.
 
 
-fid() ->
-    {Mega, Sec, Micro} = erlang:now(),
-    Timestamp = (Mega * 1000000 + Sec) * 1000000 + Micro,
-    list_to_binary(integer_to_list(Timestamp, 16)).
-
-
 terminate(_Req, _State) ->
     ok.
-
-
-% XXX: duplicated code, see fipes_pipe:uid/0.
-uid() ->
-    {Mega, Sec, Micro} = erlang:now(),
-    Timestamp = (Mega * 1000000 + Sec) * 1000000 + Micro,
-    list_to_binary(integer_to_list(Timestamp, 16)).
 
