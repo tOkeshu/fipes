@@ -1,17 +1,15 @@
 -module(fipes_pipe).
--behaviour(cowboy_http_handler).
--behaviour(cowboy_http_websocket_handler).
 
 -export([init/3, handle/2, terminate/2]).
 -export([websocket_init/3, websocket_handle/3,
          websocket_info/3, websocket_terminate/3]).
 
 
-init({_Any, http}, Req, []) ->
-    case cowboy_http_req:header('Upgrade', Req) of
+init({tcp, http}, Req, _Opts) ->
+    case cowboy_req:header(<<"upgrade">>, Req) of
         {undefined, Req2} -> {ok, Req2, []};
-        {<<"websocket">>, _Req2} -> {upgrade, protocol, cowboy_http_websocket};
-        {<<"WebSocket">>, _Req2} -> {upgrade, protocol, cowboy_http_websocket}
+        {<<"websocket">>, _Req2} -> {upgrade, protocol, cowboy_websocket};
+        {<<"WebSocket">>, _Req2} -> {upgrade, protocol, cowboy_websocket}
     end.
 
 
@@ -21,30 +19,30 @@ handle(Req, State) ->
 
 
 dispatch(Req) ->
-    case cowboy_http_req:method(Req) of
-        {'GET', Req} ->
+    case cowboy_req:method(Req) of
+        {<<"GET">>, Req} ->
             fail(Req);
-        {'POST', Req} ->
+        {<<"POST">>, Req} ->
             create(Req)
     end.
 
 
 fail(Req) ->
-    case cowboy_http_req:binding(pipe, Req) of
+    case cowboy_req:binding(pipe, Req) of
         %% /fipes => 405 Method Not Allowed
         {undefined, Req2} ->
-            cowboy_http_req:reply(405, [], <<"">>, Req2);
+            cowboy_req:reply(405, [], <<"">>, Req2);
         %% /fipes/:fipe => Only supports websockets
         {_Pipe, Req2} ->
             Message = <<"This resource supports websockets only.">>,
-            cowboy_http_req:reply(400, [], Message, Req2)
+            cowboy_req:reply(400, [], Message, Req2)
     end.
 
 
 create(Req) ->
     Headers = [{<<"Content-Type">>, <<"application/tnetstrings">>}],
     Result  = tnetstrings:encode({struct, [{id, fipes_utils:token(10)}]}),
-    cowboy_http_req:reply(200, Headers, Result, Req).
+    cowboy_req:reply(200, Headers, Result, Req).
 
 
 
@@ -57,8 +55,8 @@ websocket_init(_Any, Req, []) ->
     % Send a new uid to the user who opened the fipe.
     self() ! {uid, fipes_utils:token(8)},
 
-    {Fipe, Req} = cowboy_http_req:binding(pipe, Req),
-    Req2 = cowboy_http_req:compact(Req),
+    {Fipe, Req} = cowboy_req:binding(pipe, Req),
+    Req2 = cowboy_req:compact(Req),
     {ok, Req2, [Fipe, undefined], hibernate}.
 
 websocket_handle({text, Msg}, Req, [Fipe, _Uid]) ->
