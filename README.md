@@ -40,16 +40,8 @@ Here is a sample configuration for nginx:
         server_name_in_redirect off;
 
         location / {
-               proxy_pass http://127.0.0.1:3473/index.html;
-        }
-
-        location /fipes {
-               proxy_pass http://127.0.0.1:3473/fipes;
                proxy_read_timeout 900;
-        }
-
-        location /static/ {
-               proxy_pass http://127.0.0.1:3473/static/;
+               proxy_pass http://127.0.0.1:3473;
         }
     }
 

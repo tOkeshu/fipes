@@ -18,7 +18,7 @@
                  % /static/a/b/c             => cowboy_static
                  % /a/b/c                    => cowboy_static
                  {[<<"static">>, '...'], cowboy_static, ?STATIC_CONF},
-                 {['...'], cowboy_static, ?STATIC_CONF}]).
+                 {[], cowboy_static, ?STATIC_CONF ++ [{file, <<"index.html">>}]}]).
 
 start() ->
     application:start(fipes).
