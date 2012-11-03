@@ -43,6 +43,12 @@ Here is a sample configuration for nginx:
                proxy_read_timeout 900;
                proxy_pass http://127.0.0.1:3473;
         }
+
+        # Uncomment the lines below if you want to launch the js tests
+        #
+        # location /tests/ {
+        #        proxy_pass http://127.0.0.1:3473/tests.html;
+        # }
     }
 
 Enable your site:
