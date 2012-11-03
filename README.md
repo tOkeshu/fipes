@@ -53,7 +53,7 @@ Enable your site:
 ### Start the server
 
     $ cd fipes
-    $ ./rel/fipes/bin/fipes start # start the server on port 3473
+    $ make start # start the server on port 3473
 
 Then open a browser to http://fipes.example.com (where
 `fipes.example.com` is your domain).
