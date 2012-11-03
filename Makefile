@@ -14,11 +14,6 @@ stop: rel/fipes/bin/fipes
 compile:
 	@$(REBAR) get-deps compile
 
-tests:
-	@make -s start
-	@casperjs test fipes/tests
-	@make -s stop
-
 clean:
 	@$(REBAR) clean
 	rm -f erl_crash.dump
