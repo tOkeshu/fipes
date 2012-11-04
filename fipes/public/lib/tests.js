@@ -1,3 +1,6 @@
+// FIXME: non atomic tests, uh ?
+QUnit.config.reorder = false;
+
 var factories = {
     file: function(name, content) {
         var blob = new Blob([content], {type: 'plain/text'})
@@ -16,6 +19,51 @@ var factories = {
 
         var event = factories.fileEvent(files);
         App.FipeView.selectFiles(event);
+    },
+
+    offerAsSomeoneElse: function(files) {
+        if (!_.isArray(files))
+            files = [files]
+
+        var uri = "ws://" + location.host + ':3473' + App.Fipe.url();
+        var ws  = new WebSocket(uri);
+        var xhr = new XMLHttpRequest;
+
+        ws.onmessage = function(evt) {
+            var event = tnetstrings.parse(evt.data).value;
+
+            switch (event.type) {
+            case "uid":
+                _.each(files, function(file) {
+                    factories.registerFile(event.uid, file, xhr);
+                });
+            }
+        }
+
+        return factories.remoteOffer(xhr, ws);
+    },
+
+    registerFile: function(uid, file, xhr) {
+        var payload = tnetstrings.dump({
+            id:    'fake',
+            name:  file.name,
+            type:  file.type,
+            size:  file.size,
+            owner: uid
+        });
+
+        xhr.open('POST', App.Fipe.url() + '/files', false);
+        xhr.send(payload);
+    },
+
+    remoteOffer: function(xhr, ws) {
+        return {
+            xhr: xhr,
+            ws: ws,
+            stop: function() {
+                ws.close();
+            }
+        };
     },
 
     download: function(url) {
@@ -60,6 +108,24 @@ test('Offer multiple files', function() {
         equal($('.files > ul > li').length, 3, 'There is 3 offered files');
 
         start();
+    }, 1000);
+});
+
+test('Someone else offers a few files then leaves', function() {
+    stop();
+
+    var files = [factories.file('Another', 'Another file'),
+                 factories.file('And again', 'And another again')];
+    var offer = factories.offerAsSomeoneElse(files);
+
+    setTimeout(function() {
+        equal($('.files > ul > li').length, 5, 'There is 5 offered files');
+        offer.stop();
+
+        setTimeout(function() {
+            equal($('.files > ul > li').length, 3, 'There is now 3 offered files');
+            start();
+        }, 1000);
     }, 1000);
 });
 
