@@ -48,3 +48,18 @@ test('Offer a file then download it', function() {
         start();
     }, 1000);
 });
+
+test('Offer multiple files', function() {
+    stop();
+
+    var files = [factories.file('1st', 'First file'),
+                 factories.file('2nd', 'Second file')];
+    factories.offer(files);
+
+    setTimeout(function() {
+        equal($('.files > ul > li').length, 3, 'There is 3 offered files');
+
+        start();
+    }, 1000);
+});
+
