@@ -48,12 +48,12 @@ download(Fipe, FileId, Req) ->
     File = find_file(Fipe, FileId),
 
     Headers =
-        [{<<"Content-Type">>,        <<"application/octet-stream">>},
+        [{<<"Content-Type">>, <<"application/octet-stream">>},
          {<<"Content-Disposition">>, [<<"attachment; filename=\"">>, File#file.name, <<"\"">>]},
-         % Says to Nginx to not buffer this response
+         {<<"Access-Control-Allow-Origin">>, <<"*">>},
+         % Tell Nginx to not buffer this response
          % http://wiki.nginx.org/X-accel#X-Accel-Buffering
-         {<<"X-Accel-Buffering">>,   <<"no">>}
-        ],
+         {<<"X-Accel-Buffering">>, <<"no">>}],
     {ok, Req2} = cowboy_req:chunked_reply(200, Headers, Req),
 
     % Ask the file owner to start the stream

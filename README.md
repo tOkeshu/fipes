@@ -43,6 +43,12 @@ Here is a sample configuration for nginx:
                proxy_read_timeout 900;
                proxy_pass http://127.0.0.1:3473;
         }
+
+        # Uncomment the lines below if you want to launch the js tests
+        #
+        # location /tests/ {
+        #        proxy_pass http://127.0.0.1:3473/tests.html;
+        # }
     }
 
 Enable your site:
@@ -53,7 +59,7 @@ Enable your site:
 ### Start the server
 
     $ cd fipes
-    $ ./rel/fipes/bin/fipes start # start the server on port 3473
+    $ make start # start the server on port 3473
 
 Then open a browser to http://fipes.example.com (where
 `fipes.example.com` is your domain).

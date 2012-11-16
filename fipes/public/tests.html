@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Fipes</title>
+    <title>Fipes Tests</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 
     <title>Fipes, plumbings to share files</title>
@@ -16,6 +16,7 @@
 
     <!-- Stylesheets -->
     <link type="text/css" href="/static/css/fipes.css" rel="stylesheet"/>
+    <link type="text/css" href="/static/css/qunit.css" rel="stylesheet"/>
     <link type="text/css" href="http://fonts.googleapis.com/css?family=Ruluko" rel="stylesheet">
 
     <!-- libs -->
@@ -45,7 +46,7 @@
     <div id="main">
 
       <header>
-        <h1 class="title"><a href="/">Fipes</a></h1>
+        <h1 class="title"><a href="/tests">Fipes</a></h1>
       </header>
 
       <article>
@@ -117,6 +118,11 @@
         <div style="width: <%= progress %>%" class="bar"></div>
       </div>
     </script>
+
+    <div id="qunit"></div>
+    <script src="/static/lib/qunit.js"></script>
+    <script src="/static/lib/factories.js"></script>
+    <script src="/static/lib/tests.js"></script>
 
   </body>
 </html>
