@@ -13,8 +13,13 @@ Fipes provides you a simple way to share files with your friends.
 
 ### Requirements
 
-  * [Erlang](http://www.erlang.org/download.html) (R14B04 or later)
-  * [Rebar](https://github.com/basho/rebar) (already in the repository)
+  * [Erlang](http://www.erlang.org/download.html) (R15B or later)
+  * [Rebar](https://github.com/basho/rebar)
+
+You will need `rebar` installed in your `$PATH`.
+
+Please see the [rebar repository](https://github.com/basho/rebar) for
+downloading and building instructions.
 
 ### Install the project
 
