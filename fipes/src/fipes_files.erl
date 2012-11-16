@@ -1,6 +1,9 @@
 -module(fipes_files).
 
 -export([init/3, handle/2, terminate/2]).
+-export([to_tnestring_struct/1]).
+
+-include("fipes.hrl").
 
 
 init({tcp, http}, Req, []) ->
@@ -19,8 +22,8 @@ dispatch(Req) ->
             case cowboy_req:binding(file, Req) of
                 {undefined, Req} ->
                     index(Fipe, Req);
-                {File, Req} ->
-                    download(Fipe, File, Req)
+                {FileId, Req} ->
+                    download(Fipe, FileId, Req)
             end;
         {<<"POST">>, Req} ->
             create(Fipe, Req)
@@ -28,26 +31,25 @@ dispatch(Req) ->
 
 
 index(Fipe, Req) ->
-    Headers    = [{<<"Content-Type">>, <<"application/tnetstrings">>}],
+    Objects = ets:match_object(files, {{Fipe, '_'}, '_'}),
+    Files   = [to_tnestring_struct(File) ||
+                  {{Fipe, _FileId}, File} <- Objects],
+    Results = tnetstrings:encode(Files, [{label, atom}]),
 
-    Objects    = ets:match_object(files, {{Fipe, '_'}, '_'}),
-    FilesInfos = [{struct, FileInfos} ||
-                     {{Fipe, _FileId}, {_Owner, FileInfos}} <- Objects],
-    Results    = tnetstrings:encode(FilesInfos, [{label, atom}]),
-
+    Headers = [{<<"Content-Type">>, <<"application/tnetstrings">>}],
     cowboy_req:reply(200, Headers, Results, Req).
 
 
-download(Fipe, File, Req) ->
+download(Fipe, FileId, Req) ->
     % Register the downloader
     Uid = fipes_utils:token(8),
     ets:insert(downloaders, {{Fipe, Uid}, self()}),
 
-    Name = name(Fipe, File),
+    File = find_file(Fipe, FileId),
 
     Headers =
         [{<<"Content-Type">>,        <<"application/octet-stream">>},
-         {<<"Content-Disposition">>, [<<"attachment; filename=\"">>, Name, <<"\"">>]},
+         {<<"Content-Disposition">>, [<<"attachment; filename=\"">>, File#file.name, <<"\"">>]},
          % Says to Nginx to not buffer this response
          % http://wiki.nginx.org/X-accel#X-Accel-Buffering
          {<<"X-Accel-Buffering">>,   <<"no">>}
@@ -55,75 +57,87 @@ download(Fipe, File, Req) ->
     {ok, Req2} = cowboy_req:chunked_reply(200, Headers, Req),
 
     % Ask the file owner to start the stream
-    Owner = owner(Fipe, File),
-    Owner ! {stream, File, Uid, 0},
+    File#file.owner ! {stream, FileId, Uid, 0},
 
-    stream(Fipe, File, Owner, Uid, Req2).
-
-
-owner(Fipe, File) ->
-    [{{Fipe, File}, {Uid, _FileInfos}}] = ets:lookup(files, {Fipe, File}),
-    [{{Fipe, Uid}, Owner}] = ets:lookup(owners, {Fipe, Uid}),
-    Owner.
-
-name(Fipe, File) ->
-    [{{Fipe, File}, {_Uid, FileInfos}}] = ets:lookup(files, {Fipe, File}),
-    proplists:get_value(name, FileInfos).
+    stream(File, Uid, Req2).
 
 
-stream(Fipe, File, Owner, Uid, Req) ->
+find_file(Fipe, FileId) ->
+    [{{Fipe, FileId}, File}] = ets:lookup(files, {Fipe, FileId}),
+    File.
+
+
+stream(File, Uid, Req) ->
     receive
         {chunk, eos} ->
-            ets:delete(downloaders, {Fipe, Uid}),
+            ets:delete(downloaders, {File#file.fipe, Uid}),
             {ok, Req};
         {chunk, FirstChunk} ->
             <<SmallChunk:1/binary, NextCurrentChunk/binary>> = FirstChunk,
             cowboy_req:chunk(SmallChunk, Req),
             NextSeek = size(FirstChunk),
-            Owner ! {stream, File, Uid, NextSeek},
-            stream(Fipe, File, Owner, Uid, NextCurrentChunk, NextSeek, Req)
+            File#file.owner ! {stream, File#file.id, Uid, NextSeek},
+            stream(File, Uid, NextCurrentChunk, NextSeek, Req)
     end.
-stream(Fipe, File, Owner, Uid, CurrentChunk, Seek, Req) ->
+stream(File, Uid, CurrentChunk, Seek, Req) ->
     receive
         {chunk, eos} ->
             cowboy_req:chunk(CurrentChunk, Req),
-            ets:delete(downloaders, {Fipe, Uid}),
+            ets:delete(downloaders, {File#file.fipe, Uid}),
             {ok, Req};
         {chunk, NextChunk} ->
             cowboy_req:chunk(CurrentChunk, Req),
             NextSeek = Seek + size(NextChunk),
-            Owner ! {stream, File, Uid, NextSeek},
-            stream(Fipe, File, Owner, Uid, NextChunk, NextSeek, Req)
+            File#file.owner ! {stream, File#file.id, Uid, NextSeek},
+            stream(File, Uid, NextChunk, NextSeek, Req)
     after
         20000 ->
             <<SmallChunk:1/binary, NexCurrentChunk/binary>> = CurrentChunk,
             cowboy_req:chunk(SmallChunk, Req),
-            stream(Fipe, File, Owner, Uid, NexCurrentChunk, Seek, Req)
+            stream(File, Uid, NexCurrentChunk, Seek, Req)
     end.
 
 
 create(Fipe, Req) ->
-    {FileId, Owner, FileInfos} = file_infos(Req),
-    true = ets:insert(files, {{Fipe, FileId}, {Owner, FileInfos}}),
-
-    notify(Fipe, FileInfos),
+    File = file_from_req(Fipe, Req),
+    true = ets:insert(files, {{Fipe, File#file.id}, File}),
+    TnetFile = to_tnestring_struct(File),
+    notify(Fipe, TnetFile),
 
     Headers = [{<<"Content-Type">>, <<"application/tnetstrings">>}],
-    Result  = tnetstrings:encode({struct, FileInfos}),
+    Result  = tnetstrings:encode(TnetFile),
     cowboy_req:reply(200, Headers, Result, Req).
 
 
-file_infos(Req) ->
+to_tnestring_struct(File) ->
+    {struct, [{id,    File#file.id},
+              {name,  File#file.name},
+              {type,  File#file.type},
+              {size,  File#file.size},
+              {owner, File#file.owner_id}]}.
+
+file_from_req(Fipe, Req) ->
     FileId = fipes_utils:token(2),
 
     {ok, Body, Req2} = cowboy_req:body(Req),
     {struct, FileInfos} = tnetstrings:decode(Body, [{label, atom}]),
-    Owner = proplists:get_value(owner, FileInfos),
 
-    {FileId, Owner, [{id, FileId}|FileInfos]}.
+    Uid = proplists:get_value(owner, FileInfos),
+    [{{Fipe, Uid}, Owner}] = ets:lookup(owners, {Fipe, Uid}),
 
-notify(Fipe, FileInfos) ->
-    [Owner ! {new, FileInfos} ||
+    Name = proplists:get_value(name, FileInfos),
+    Type = proplists:get_value(type, FileInfos),
+    Size = proplists:get_value(size, FileInfos),
+    File = #file{id=FileId,
+                 name=Name,
+                 type=Type,
+                 size=Size,
+                 fipe=Fipe,
+                 owner_id=Uid,
+                 owner=Owner}.
+
+notify(Fipe, File) ->
+    [Owner ! {new, File} ||
         {{OtherFipe, Uid}, Owner} <- ets:tab2list(owners), OtherFipe == Fipe],
     ok.
 

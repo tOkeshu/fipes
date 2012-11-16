@@ -4,6 +4,8 @@
 -export([websocket_init/3, websocket_handle/3,
          websocket_info/3, websocket_terminate/3]).
 
+-include("fipes.hrl").
+
 
 init({tcp, http}, Req, _Opts) ->
     case cowboy_req:header(<<"upgrade">>, Req) of
@@ -79,31 +81,38 @@ websocket_info({uid, Uid}, Req, [Fipe, undefined]) ->
                                          {uid, Uid}
                                         ]}),
     {reply, {text, Event}, Req, [Fipe, Uid], hibernate};
-websocket_info({new, FilesInfos}, Req, State) ->
+websocket_info({new, File}, Req, State) ->
     Event = tnetstrings:encode({struct, [{type, <<"file.new">>},
-                                         {file, {struct, FilesInfos}}]}),
+                                         {file, File}]}),
     {reply, {text, Event}, Req, State, hibernate};
-websocket_info({remove, FilesInfos}, Req, State) ->
+websocket_info({remove, File}, Req, State) ->
     Event = tnetstrings:encode({struct, [{type, <<"file.remove">>},
-                                         {file, {struct, FilesInfos}}]}),
+                                         {file, File}]}),
     {reply, {text, Event}, Req, State, hibernate};
 websocket_info(_Info, Req, State) ->
     {ok, Req, State, hibernate}.
 
 websocket_terminate(_Reason, _Req, [Fipe, Uid]) ->
     % Find the user's files
-    Files = ets:match_object(files, {{Fipe, '_'}, {Uid, '_'}}),
+    Match = #file{id='_',
+                  name='_',
+                  type='_',
+                  size='_',
+                  fipe='_',
+                  owner_id='_',
+                  owner=self()},
+    Files = ets:match_object(files, {{Fipe, '_'}, Match}),
     [begin
-         notify(Fipe, FileInfos),
+         notify(Fipe, File),
          ets:delete(files, {Fipe, FileId})
-     end || {{_Fipe, FileId}, {_Owner, FileInfos}} <- Files],
+     end || {{_Fipe, FileId}, File} <- Files],
     ets:delete(owners, {Fipe, Uid}),
     ok.
 
 
 % XXX: duplicated code, see fipes_files:notify/2.
-notify(Fipe, FileInfos) ->
-    [Owner ! {remove, FileInfos} ||
+notify(Fipe, File) ->
+    [Owner ! {remove, fipes_files:to_tnestring_struct(File)} ||
         {{OtherFipe, _Uid}, Owner} <- ets:tab2list(owners), OtherFipe == Fipe],
     ok.
 
