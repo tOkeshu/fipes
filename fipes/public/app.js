@@ -14,13 +14,8 @@ window.App = {
 
 App.Router = Backbone.Router.extend({
     routes: {
-        "/"            : "root",
-        "/fipes"       : "fipes",
-        "/fipes/:fipe" : "fipe"
-    },
-
-    root: function() {
-        App.Routes.navigate('/fipes', true);
+        "/"      : "fipes",
+        "/:fipe" : "fipe"
     },
 
     fipes: function() {

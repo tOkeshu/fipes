@@ -61,7 +61,7 @@
             var fipe = new App.Models.Fipe;
             fipe.save({}, {
                 success: function() {
-                    App.Routes.navigate(fipe.url(), true);
+                    App.Routes.navigate('/' + fipe.id, true);
                 }
             });
         }
