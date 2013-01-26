@@ -74,7 +74,7 @@ stream(File, Uid, Req) ->
             {ok, Req};
         {chunk, FirstChunk} ->
             <<SmallChunk:1/binary, NextCurrentChunk/binary>> = FirstChunk,
-            cowboy_req:chunk(SmallChunk, Req),
+            send_chunk(SmallChunk, Req),
             NextSeek = size(FirstChunk),
             File#file.owner ! {stream, File#file.id, Uid, NextSeek},
             stream(File, Uid, NextCurrentChunk, NextSeek, Req)
@@ -82,21 +82,24 @@ stream(File, Uid, Req) ->
 stream(File, Uid, CurrentChunk, Seek, Req) ->
     receive
         {chunk, eos} ->
-            cowboy_req:chunk(CurrentChunk, Req),
+            send_chunk(CurrentChunk, Req),
             ets:delete(downloaders, {File#file.fipe, Uid}),
             {ok, Req};
         {chunk, NextChunk} ->
-            cowboy_req:chunk(CurrentChunk, Req),
+            send_chunk(CurrentChunk, Req),
             NextSeek = Seek + size(NextChunk),
             File#file.owner ! {stream, File#file.id, Uid, NextSeek},
             stream(File, Uid, NextChunk, NextSeek, Req)
     after
         20000 ->
             <<SmallChunk:1/binary, NexCurrentChunk/binary>> = CurrentChunk,
-            cowboy_req:chunk(SmallChunk, Req),
+            send_chunk(SmallChunk, Req),
             stream(File, Uid, NexCurrentChunk, Seek, Req)
     end.
 
+send_chunk(Chunk, Req) ->
+    fipes_stats:push('total-data-transfer', size(Chunk)),
+    cowboy_req:chunk(Chunk, Req).
 
 create(Fipe, Req) ->
     File = file_from_req(Fipe, Req),
