@@ -84,11 +84,19 @@ $(document).ready(function() {
         App.Routes.navigate('/', true);
     }
 
+    function dispatch(event) {
+        var tdt = document.querySelector('.' + event.type);
+        var data = event.data
+        if (event.type == 'total-data' || event.type == 'average-size')
+            data = App.Helpers.humanSize(parseInt(event.data))
+
+        tdt.textContent = data;
+    };
     var source = new EventSource("/stats")
-    source.addEventListener('total-data-transfer', function(event) {
-        var tdt = document.querySelector('.total-data-transfer');
-        tdt.textContent = App.Helpers.humanSize(parseInt(event.data));
-    });
+    source.addEventListener('total-data', dispatch);
+    source.addEventListener('total-files', dispatch);
+    source.addEventListener('total-uploads', dispatch);
+    source.addEventListener('average-size', dispatch);
 
     window.onbeforeunload = function (event) {
         if (App.Files == undefined || App.Files.size() == 0) {

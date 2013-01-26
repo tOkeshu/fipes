@@ -23,7 +23,10 @@ push(Type, N) ->
 
 
 init(_Args) ->
-    Stats = [{'total-data-transfer', 0}],
+    Stats = [{'total-data', 0},
+             {'total-files', 0},
+             {'total-uploads', 0},
+             {'average-size', 0}],
     Subscribers = [],
     {ok, {Stats, Subscribers}}.
 
@@ -31,11 +34,22 @@ handle_call(_Msg, _From, State) ->
     {reply, {error, unexpected_message}, State}.
 
 handle_cast({subscribe, Subscriber}, {Stats, Subscribers}) ->
-    N = proplists:get_value('total-data-transfer', Stats),
-    Subscriber ! {event, 'total-data-transfer', N},
+    [Subscriber ! {event, Type, proplists:get_value(Type, Stats)} ||
+        Type <- proplists:get_keys(Stats)],
     {noreply, {Stats, [Subscriber|Subscribers]}};
 handle_cast({unsubscribe, Subscriber}, {Stats, Subscribers}) ->
     {noreply, {Stats, lists:delete(Subscriber, Subscribers)}};
+handle_cast({push, Type = 'average-size', N}, {Stats, Subscribers}) ->
+    NbFiles = proplists:get_value('total-files', Stats),
+    OldN = proplists:get_value(Type, Stats),
+    NewN = case NbFiles of
+               1 -> N;
+               _Else -> erlang:round(((NbFiles - 1) * OldN + N) / NbFiles)
+           end,
+    [Subscriber ! {event, Type, NewN} || Subscriber <- Subscribers],
+
+    NewStats = lists:keyreplace(Type, 1, Stats, {Type, NewN}),
+    {noreply, {NewStats, Subscribers}};
 handle_cast({push, Type, N}, {Stats, Subscribers}) ->
     OldN = proplists:get_value(Type, Stats),
     [Subscriber ! {event, Type, OldN + N} || Subscriber <- Subscribers],

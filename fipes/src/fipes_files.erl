@@ -59,6 +59,9 @@ download(Fipe, FileId, Req) ->
     % Ask the file owner to start the stream
     File#file.owner ! {stream, FileId, Uid, 0},
 
+    fipes_stats:push('total-files', 1),
+    fipes_stats:push('average-size', File#file.size),
+    fipes_stats:push('total-uploads', 1),
     stream(File, Uid, Req2).
 
 
@@ -98,7 +101,7 @@ stream(File, Uid, CurrentChunk, Seek, Req) ->
     end.
 
 send_chunk(Chunk, Req) ->
-    fipes_stats:push('total-data-transfer', size(Chunk)),
+    fipes_stats:push('total-data', size(Chunk)),
     cowboy_req:chunk(Chunk, Req).
 
 create(Fipe, Req) ->
