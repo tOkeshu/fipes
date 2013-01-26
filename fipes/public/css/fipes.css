@@ -107,6 +107,17 @@ body {
   text-decoration: underline;
 }
 
+/* Stats */
+
+.stats {
+  color:          #072c4f;
+  font-size:      20px;
+  margin:         auto;
+  text-align:     center;
+  text-shadow:    0 1px 2px #888888;
+  text-transform: uppercase;
+}
+
 /* Files */
 
 .files ul {

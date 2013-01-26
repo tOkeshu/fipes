@@ -84,6 +84,12 @@ $(document).ready(function() {
         App.Routes.navigate('/', true);
     }
 
+    var source = new EventSource("/stats")
+    source.addEventListener('total-data-transfer', function(event) {
+        var tdt = document.querySelector('.total-data-transfer');
+        tdt.textContent = App.Helpers.humanSize(parseInt(event.data));
+    });
+
     window.onbeforeunload = function (event) {
         if (App.Files == undefined || App.Files.size() == 0) {
             return;
