@@ -15,6 +15,9 @@
                  {[<<"fipes">>, pipe],                    fipes_pipe,  []},
                  {[<<"fipes">>],                          fipes_pipe,  []},
 
+                 % /stats
+                 {[<<"stats">>],                          fipes_stats_api, []},
+
                  % /static/a/b/c             => cowboy_static
                  % /a/b/c                    => cowboy_static
                  {[<<"static">>, '...'], cowboy_static, ?STATIC_CONF},
@@ -32,6 +35,7 @@ start(_Type, _Args) ->
     ets:new(files,       [set, public, named_table]),
     ets:new(owners,      [set, public, named_table]),
     ets:new(downloaders, [set, public, named_table]),
+    fipes_stats:start_link(),
     fipes_sup:start_link().
 
 
