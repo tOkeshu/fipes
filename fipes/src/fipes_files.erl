@@ -59,7 +59,6 @@ download(Fipe, FileId, Req) ->
     % Ask the file owner to start the stream
     File#file.owner ! {stream, FileId, Uid, 0},
 
-    fipes_stats:push('total-files', 1),
     fipes_stats:push('average-size', File#file.size),
     fipes_stats:push('total-uploads', 1),
     stream(File, Uid, Req2).
@@ -112,6 +111,7 @@ create(Fipe, Req) ->
 
     Headers = [{<<"Content-Type">>, <<"application/tnetstrings">>}],
     Result  = tnetstrings:encode(TnetFile),
+    fipes_stats:push('total-files', 1),
     cowboy_req:reply(200, Headers, Result, Req).
 
 
