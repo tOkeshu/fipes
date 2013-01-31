@@ -59,6 +59,8 @@ download(Fipe, FileId, Req) ->
     % Ask the file owner to start the stream
     File#file.owner ! {stream, FileId, Uid, 0},
 
+    fipes_stats:push('average-size', File#file.size),
+    fipes_stats:push('total-uploads', 1),
     stream(File, Uid, Req2).
 
 
@@ -74,7 +76,7 @@ stream(File, Uid, Req) ->
             {ok, Req};
         {chunk, FirstChunk} ->
             <<SmallChunk:1/binary, NextCurrentChunk/binary>> = FirstChunk,
-            cowboy_req:chunk(SmallChunk, Req),
+            send_chunk(SmallChunk, Req),
             NextSeek = size(FirstChunk),
             File#file.owner ! {stream, File#file.id, Uid, NextSeek},
             stream(File, Uid, NextCurrentChunk, NextSeek, Req)
@@ -82,21 +84,24 @@ stream(File, Uid, Req) ->
 stream(File, Uid, CurrentChunk, Seek, Req) ->
     receive
         {chunk, eos} ->
-            cowboy_req:chunk(CurrentChunk, Req),
+            send_chunk(CurrentChunk, Req),
             ets:delete(downloaders, {File#file.fipe, Uid}),
             {ok, Req};
         {chunk, NextChunk} ->
-            cowboy_req:chunk(CurrentChunk, Req),
+            send_chunk(CurrentChunk, Req),
             NextSeek = Seek + size(NextChunk),
             File#file.owner ! {stream, File#file.id, Uid, NextSeek},
             stream(File, Uid, NextChunk, NextSeek, Req)
     after
         20000 ->
             <<SmallChunk:1/binary, NexCurrentChunk/binary>> = CurrentChunk,
-            cowboy_req:chunk(SmallChunk, Req),
+            send_chunk(SmallChunk, Req),
             stream(File, Uid, NexCurrentChunk, Seek, Req)
     end.
 
+send_chunk(Chunk, Req) ->
+    fipes_stats:push('total-data', size(Chunk)),
+    cowboy_req:chunk(Chunk, Req).
 
 create(Fipe, Req) ->
     File = file_from_req(Fipe, Req),
@@ -106,6 +111,7 @@ create(Fipe, Req) ->
 
     Headers = [{<<"Content-Type">>, <<"application/tnetstrings">>}],
     Result  = tnetstrings:encode(TnetFile),
+    fipes_stats:push('total-files', 1),
     cowboy_req:reply(200, Headers, Result, Req).
 
 
