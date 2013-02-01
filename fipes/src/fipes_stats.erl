@@ -23,10 +23,16 @@ push(Type, N) ->
 
 
 init(_Args) ->
-    Stats = [{'total-data', 0},
-             {'total-files', 0},
-             {'total-uploads', 0},
-             {'average-size', 0}],
+    Stats =
+        case file:consult("fipes/priv/stats") of
+            {error, _} ->
+                [{'total-data', 0},
+                 {'total-files', 0},
+                 {'total-uploads', 0},
+                 {'average-size', 0}];
+            {ok, [Terms]} ->
+                Terms
+        end,
     Subscribers = [],
     {ok, {Stats, Subscribers}}.
 
@@ -49,12 +55,16 @@ handle_cast({push, Type = 'average-size', N}, {Stats, Subscribers}) ->
     [Subscriber ! {event, Type, NewN} || Subscriber <- Subscribers],
 
     NewStats = lists:keyreplace(Type, 1, Stats, {Type, NewN}),
+
+    save(NewStats),
     {noreply, {NewStats, Subscribers}};
 handle_cast({push, Type, N}, {Stats, Subscribers}) ->
     OldN = proplists:get_value(Type, Stats),
     [Subscriber ! {event, Type, OldN + N} || Subscriber <- Subscribers],
 
     NewStats = lists:keyreplace(Type, 1, Stats, {Type, OldN + N}),
+
+    save(NewStats),
     {noreply, {NewStats, Subscribers}};
 handle_cast(_, State) ->
     {noreply, State}.
@@ -68,4 +78,8 @@ terminate(normal, _State) ->
 
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
+
+
+save(State) ->
+    file:write_file("fipes/priv/stats", io_lib:fwrite("~p.\n", [State])).
 
