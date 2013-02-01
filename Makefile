@@ -2,14 +2,11 @@ REBAR = rebar
 
 all: compile
 
-app: compile
-	@$(REBAR) generate force=1
+start:
+	@start
 
-start: rel/fipes/bin/fipes
-	@rel/fipes/bin/fipes start
-
-stop: rel/fipes/bin/fipes
-	@rel/fipes/bin/fipes stop
+stop:
+	@stop
 
 compile:
 	@$(REBAR) get-deps compile

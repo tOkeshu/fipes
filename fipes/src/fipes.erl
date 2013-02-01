@@ -1,9 +1,9 @@
 -module(fipes).
 -behaviour(application).
 
--export([start/0, start/2, stop/1]).
+-export([start/0, shutdown/1, start/2, stop/1]).
 
--define(PUBLIC, [<<"public">>]).
+-define(PUBLIC, [<<"fipes">>, <<"public">>]).
 -define(STATIC_CONF, [{directory, ?PUBLIC},
                       {mimetypes, {fun mimetypes:path_to_mimes/2, default}}]).
 -define(ROUTES, [% /fipes/:pipe/:files/:file => fipes_files
@@ -24,6 +24,11 @@
                  {[], cowboy_static, ?STATIC_CONF ++ [{file, <<"index.html">>}]}]).
 
 start() ->
+    application:start(crypto),
+    application:start(public_key),
+    application:start(ssl),
+    application:start(ranch),
+    application:start(cowboy),
     application:start(fipes).
 
 
@@ -38,6 +43,10 @@ start(_Type, _Args) ->
     fipes_stats:start_link(),
     fipes_sup:start_link().
 
+shutdown(Node) ->
+    true = net_kernel:connect_node(Node),
+    rpc:call(Node, init, stop, []),
+    ok.
 
 stop(_State) ->
     ok.
