@@ -33,13 +33,16 @@ start() ->
 
 
 start(_Type, _Args) ->
-    {ok, Port}      = application:get_env(fipes, port),
-    {ok, Certfile}  = application:get_env(fipes, certfile),
-    {ok, Keyfile}   = application:get_env(fipes, keyfile),
-    {ok, Password}  = application:get_env(fipes, password),
-    {ok, _Listener} =
+    {ok, Port}       = application:get_env(fipes, port),
+    {ok, CaCertfile} = application:get_env(fipes, cacertfile),
+    {ok, Certfile}   = application:get_env(fipes, certfile),
+    {ok, Keyfile}    = application:get_env(fipes, keyfile),
+    {ok, Password}   = application:get_env(fipes, password),
+
+    {ok, _Listener}  =
         cowboy:start_https(fipes_http_listener, 100,
                            [{port, Port},
+                            {cacertfile, CaCertfile},
                             {certfile, Certfile},
                             {keyfile, Keyfile},
                             {password, Password}
