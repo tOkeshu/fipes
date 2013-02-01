@@ -12,5 +12,8 @@
 		cowboy
 	]},
 	{mod, {fipes, []}},
-	{env, [{port, 3473}]}
+	{env, [{port, 3473},
+               {certfile, "fipes/priv/ssl/cert.pem"},
+               {keyfile, "fipes/priv/ssl/key.pem"},
+               {password, "cowboy"}]}
 ]}.

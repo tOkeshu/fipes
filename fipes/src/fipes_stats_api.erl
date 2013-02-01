@@ -4,7 +4,7 @@
 -include("fipes.hrl").
 
 
-init({tcp, http}, Req, []) ->
+init({ssl, http}, Req, []) ->
     %% timer:apply_interval(1000, fipes_stats, push, ['total-data-transfer', 3]),
     {ok, Req, []}.
 
