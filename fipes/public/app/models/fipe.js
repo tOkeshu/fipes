@@ -7,7 +7,7 @@
             // FIXME: Remove this ugly uri. Before that, you'll need
             // to find how to use websockets with Nginx as a reverse
             // proxy.
-            var uri = "ws://" + location.host + ':3473' + this.url();
+            var uri = "wss://" + location.host + this.url();
 
             if ("MozWebSocket" in window) {
                 WebSocket = MozWebSocket;

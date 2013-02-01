@@ -6,7 +6,7 @@
 -include("fipes.hrl").
 
 
-init({tcp, http}, Req, []) ->
+init({ssl, http}, Req, []) ->
     {ok, Req, []}.
 
 

@@ -7,7 +7,7 @@
 -include("fipes.hrl").
 
 
-init({tcp, http}, Req, _Opts) ->
+init({ssl, http}, Req, _Opts) ->
     case cowboy_req:header(<<"upgrade">>, Req) of
         {undefined, Req2} -> {ok, Req2, []};
         {<<"websocket">>, _Req2} -> {upgrade, protocol, cowboy_websocket};
