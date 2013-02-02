@@ -17,3 +17,7 @@ clean:
 
 dist-clean: clean
 
+install: compile
+	mkdir -p /usr/lib/fipes
+	cp -r fipes /usr/lib/fipes/
+	cp -r deps /usr/lib/fipes/
