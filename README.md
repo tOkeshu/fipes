@@ -32,7 +32,8 @@ a release.
 
 ### Configure Nginx
 
-Here is a sample configuration for nginx:
+Here is a sample configuration for nginx (you will need **nginx 1.4** or later to
+have WebSocket proxying):
 
     # /etc/nginx/sites-available/fipes.example.com
     server {
@@ -45,14 +46,22 @@ Here is a sample configuration for nginx:
         server_name_in_redirect off;
 
         location / {
-               proxy_read_timeout 900;
-               proxy_pass http://127.0.0.1:3473;
+            proxy_read_timeout 900;
+            proxy_pass http://127.0.0.1:3473;
+        }
+
+        # WebSocket proxying
+        location ~ /fipes/([^/]+)$ {
+            proxy_read_timeout 900;
+            proxy_pass http://127.0.0.1:3473/fipes/$1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
         }
 
         # Uncomment the lines below if you want to launch the js tests
         #
         # location /tests/ {
-        #        proxy_pass http://127.0.0.1:3473/tests.html;
+        #     proxy_pass http://127.0.0.1:3473/tests.html;
         # }
     }
 
@@ -77,19 +86,12 @@ your `/etc/hosts`:
 
 ## Bugs/Pitfalls
 
-  * For now, Fipes can't be used without Nginx proxying the application on
-    port 3473 (as shown in the sample file). Any other configuration will
-    probably fail.
-
   * Reloading the page while you're in a Fipe will stops the browser
     from serving your files. This is normal as the JavaScript File
     objects are lost while refreshing the page. You'll have to offers
     these files again.
 
   * For now, anyone can enter a Fipe.
-
-  * [Fipelines.org](http://fipelines.org) does not support https yet
-    (you have been warned!).
 
 ## What about the name
 

@@ -4,9 +4,6 @@
         urlRoot: '/fipes',
 
         open: function(callback) {
-            // FIXME: Remove this ugly uri. Before that, you'll need
-            // to find how to use websockets with Nginx as a reverse
-            // proxy.
             var uri = "wss://" + location.host + this.url();
 
             if ("MozWebSocket" in window) {
