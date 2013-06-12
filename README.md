@@ -11,6 +11,9 @@ Fipes provides you a simple way to share files with your friends.
 
 ## Getting Started
 
+**ACHTUNG: if you want to hack, you should clone the `develop` branch**. See
+`CONTRIBUTING.md` for more information.
+
 ### Requirements
 
   * [Erlang](http://www.erlang.org/download.html) (R15B or later)
@@ -92,6 +95,10 @@ your `/etc/hosts`:
     these files again.
 
   * For now, anyone can enter a Fipe.
+
+## Contribute
+
+See `CONTRIBUTING.md` in this repository for the contributing guidelines.
 
 ## What about the name
 
