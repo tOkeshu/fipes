@@ -11,10 +11,18 @@ Fipes provides you a simple way to share files with your friends.
 
 ## Getting Started
 
+**ACHTUNG: if you want to hack, you should clone the `develop` branch**. See
+`CONTRIBUTING.md` for more information.
+
 ### Requirements
 
-  * [Erlang](http://www.erlang.org/download.html) (R14B04 or later)
-  * [Rebar](https://github.com/basho/rebar) (already in the repository)
+  * [Erlang](http://www.erlang.org/download.html) (R15B or later)
+  * [Rebar](https://github.com/basho/rebar)
+
+You will need `rebar` installed in your `$PATH`.
+
+Please see the [rebar repository](https://github.com/basho/rebar) for
+downloading and building instructions.
 
 ### Install the project
 
@@ -85,8 +93,9 @@ your `/etc/hosts`:
 
   * For now, anyone can enter a Fipe.
 
-  * [Fipelines.org](http://fipelines.org) does not support https yet
-    (you have been warned!).
+## Contribute
+
+See `CONTRIBUTING.md` in this repository for the contributing guidelines.
 
 ## What about the name
 
