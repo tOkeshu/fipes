@@ -6,16 +6,8 @@
 	{applications, [
 		kernel,
 		stdlib,
-		crypto,
-		public_key,
-		ssl,
 		cowboy
 	]},
 	{mod, {fipes, []}},
-	{env, [{port, 3473},
-               % These are for dev purpose
-               {cacertfile, "fipes/priv/ssl/ca.pem"},
-               {certfile, "fipes/priv/ssl/cert.pem"},
-               {keyfile, "fipes/priv/ssl/key.pem"},
-               {password, "cowboy"}]}
+	{env, [{port, 3473}]}
 ]}.

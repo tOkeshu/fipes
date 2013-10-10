@@ -1,12 +1,12 @@
 -module(fipes_files).
 
--export([init/3, handle/2, terminate/2]).
+-export([init/3, handle/2, terminate/3]).
 -export([to_tnestring_struct/1]).
 
 -include("fipes.hrl").
 
 
-init({ssl, http}, Req, []) ->
+init({tcp, http}, Req, []) ->
     {ok, Req, []}.
 
 
@@ -33,7 +33,7 @@ dispatch(Req) ->
 index(Fipe, Req) ->
     Objects = ets:match_object(files, {{Fipe, '_'}, '_'}),
     Files   = [to_tnestring_struct(File) ||
-                  {{Fipe, _FileId}, File} <- Objects],
+                  {{_Fipe, _FileId}, File} <- Objects],
     Results = tnetstrings:encode(Files, [{label, atom}]),
 
     Headers = [{<<"Content-Type">>, <<"application/tnetstrings">>}],
@@ -125,7 +125,7 @@ to_tnestring_struct(File) ->
 file_from_req(Fipe, Req) ->
     FileId = fipes_utils:token(2),
 
-    {ok, Body, Req2} = cowboy_req:body(Req),
+    {ok, Body, _Req2} = cowboy_req:body(Req),
     {struct, FileInfos} = tnetstrings:decode(Body, [{label, atom}]),
 
     Uid = proplists:get_value(owner, FileInfos),
@@ -140,14 +140,15 @@ file_from_req(Fipe, Req) ->
                  size=Size,
                  fipe=Fipe,
                  owner_id=Uid,
-                 owner=Owner}.
+                 owner=Owner},
+    File.
 
 notify(Fipe, File) ->
     [Owner ! {new, File} ||
-        {{OtherFipe, Uid}, Owner} <- ets:tab2list(owners), OtherFipe == Fipe],
+        {{OtherFipe, _Uid}, Owner} <- ets:tab2list(owners), OtherFipe == Fipe],
     ok.
 
 
-terminate(_Req, _State) ->
+terminate(_Reason, _Req, _State) ->
     ok.
 

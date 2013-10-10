@@ -4,7 +4,7 @@
         urlRoot: '/fipes',
 
         open: function(callback) {
-            var uri = "wss://" + location.host + this.url();
+            var uri = "ws://" + location.host + this.url();
 
             if ("MozWebSocket" in window) {
                 WebSocket = MozWebSocket;

@@ -3,50 +3,42 @@
 
 -export([start/0, shutdown/1, start/2, stop/1]).
 
--define(PUBLIC, [<<"fipes">>, <<"public">>]).
--define(STATIC_CONF, [{directory, ?PUBLIC},
-                      {mimetypes, {fun mimetypes:path_to_mimes/2, default}}]).
--define(ROUTES, [% /fipes/:pipe/:files/:file => fipes_files
-                 % /fipes/:pipe/:files       => fipes_files
-                 % /fipes/:pipe              => fipes_pipe
-                 % /fipes                    => fipes_pipe
-                 {[<<"fipes">>, pipe, <<"files">>, file], fipes_files, []},
-                 {[<<"fipes">>, pipe, <<"files">>],       fipes_files, []},
-                 {[<<"fipes">>, pipe],                    fipes_pipe,  []},
-                 {[<<"fipes">>],                          fipes_pipe,  []},
+-define(STATIC_OPTIONS, [{directory, <<"./public">>},
+                         {mimetypes, [{<<".html">>, [<<"text/html">>]},
+                                      {<<".js">>,   [<<"application/javascript">>]},
+                                      {<<".css">>,  [<<"text/css">>]},
+                                      {<<".png">>,  [<<"image/png">>]},
+                                      {<<".gif">>,  [<<"image/gif">>]}]}]).
+-define(ROOT_OPTIONS, [{directory, <<"./public">>},
+                       {file, "index.html"},
+                       {mimetypes, [{<<".html">>, [<<"text/html">>]}]}]).
+-define(ROUTES, [{"/fipes/:pipe/files/:file", fipes_files, []},
+                 {"/fipes/:pipe/files",       fipes_files, []},
+                 {"/fipes/:pipe",             fipes_pipe,  []},
+                 {"/fipes",                   fipes_pipe,  []},
+                 {"/stats",                   fipes_stats_api, []},
+                 {"/static/[...]", cowboy_static, ?STATIC_OPTIONS},
+                 {"/",             cowboy_static, ?ROOT_OPTIONS}]).
 
-                 % /stats
-                 {[<<"stats">>],                          fipes_stats_api, []},
-
-                 % /static/a/b/c             => cowboy_static
-                 % /a/b/c                    => cowboy_static
-                 {[<<"static">>, '...'], cowboy_static, ?STATIC_CONF},
-                 {[], cowboy_static, ?STATIC_CONF ++ [{file, <<"index.html">>}]}]).
 
 start() ->
-    application:start(crypto),
-    application:start(public_key),
-    application:start(ssl),
-    application:start(ranch),
-    application:start(cowboy),
-    application:start(fipes).
+    ok = application:start(crypto),
+    ok = application:start(ranch),
+    ok = application:start(cowboy),
+    ok = application:start(fipes),
+    ok.
 
 
 start(_Type, _Args) ->
-    {ok, Port}       = application:get_env(fipes, port),
-    {ok, CaCertfile} = application:get_env(fipes, cacertfile),
-    {ok, Certfile}   = application:get_env(fipes, certfile),
-    {ok, Keyfile}    = application:get_env(fipes, keyfile),
-    {ok, Password}   = application:get_env(fipes, password),
+    Dispatch = cowboy_router:compile([{'_', ?ROUTES}]),
 
-    {ok, _Listener}  =
-        cowboy:start_https(fipes_http_listener, 100,
-                           [{port, Port},
-                            {cacertfile, CaCertfile},
-                            {certfile, Certfile},
-                            {keyfile, Keyfile},
-                            {password, Password}
-                           ], [{dispatch, [{'_', ?ROUTES}]}]),
+    {ok, Port} = application:get_env(fipes, port),
+    {ok, _Listener} =
+        cowboy:start_http(http,
+                          100,
+                          [{port, Port}],
+                          [{env, [{dispatch, Dispatch}]}]),
+
     ets:new(files,       [set, public, named_table]),
     ets:new(owners,      [set, public, named_table]),
     ets:new(downloaders, [set, public, named_table]),
