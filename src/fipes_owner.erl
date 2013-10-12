@@ -1,20 +1,21 @@
 -module(fipes_owner).
 
+-define(TABLE, owners).
 -export([find/2, register/3, unregister/2, notify/2]).
 
 
 find(Fipe, Uid) ->
-    [{{Fipe, Uid}, User}] = ets:lookup(users, {Fipe, Uid}),
-    User.
+    [{{Fipe, Uid}, Owner}] = ets:lookup(?TABLE, {Fipe, Uid}),
+    Owner.
 
-register(Fipe, Uid, User) ->
-    ets:insert(users, {{Fipe, Uid}, User}).
+register(Fipe, Uid, Owner) ->
+    ets:insert(?TABLE, {{Fipe, Uid}, Owner}).
 
 unregister(Fipe, Uid) ->
-    ets:delete(users, {Fipe, Uid}).
+    ets:delete(?TABLE, {Fipe, Uid}).
 
 notify(Fipe, Event) ->
-    [Owner ! Event ||
-        {{OtherFipe, _Uid}, Owner} <- ets:tab2list(users), OtherFipe == Fipe],
-    ok.
+    Objects = ets:match_object(?TABLE, {{Fipe, '_'}, '_'}),
+    [Owner ! Event || {{_Fipe, _Uid}, Owner} <- Objects].
+
 

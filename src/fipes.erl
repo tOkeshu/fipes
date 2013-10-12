@@ -38,7 +38,7 @@ start(_Type, _Args) ->
                           [{env, [{dispatch, Dispatch}]}]),
 
     ets:new(files,       [set, public, named_table]),
-    ets:new(users,       [set, public, named_table]),
+    ets:new(owners,      [set, public, named_table]),
     ets:new(downloaders, [set, public, named_table]),
     fipes_stats:start_link(),
     fipes_sup:start_link().
