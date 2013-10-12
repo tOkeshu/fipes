@@ -28,9 +28,8 @@ dispatch(Req) ->
 
 
 index(Fipe, Req) ->
-    Objects = ets:match_object(files, {{Fipe, '_'}, '_'}),
     Files   = [fipes_file:to_tnetstring(File) ||
-                  {{_Fipe, _FileId}, File} <- Objects],
+                  File <- fipes_file:find_by_fipe(Fipe)],
     Results = tnetstrings:encode(Files, [{label, atom}]),
 
     Headers = [{<<"Content-Type">>, <<"application/tnetstrings">>}],

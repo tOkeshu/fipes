@@ -1,7 +1,8 @@
 -module(fipes_file).
 
 -export([id/1, name/1, type/1, size/1, fipe/1, owner_id/1, owner/1]).
--export([to_tnetstring/1, from_proplist/1, find_by_owner/1, delete/1]).
+-export([to_tnetstring/1, from_proplist/1, find_by_owner/1, find_by_fipe/1]).
+-export([delete/1]).
 
 -record(file, {id       :: binary(),
                name     :: binary(),
@@ -59,6 +60,12 @@ find_by_owner(Uid) ->
                   owner    = '_'},
     Files = ets:match_object(files, {{'_', '_'}, Match}),
     [File || {{_Fipe, _FileId}, File} <- Files].
+
+find_by_fipe(Fipe) ->
+    Objects = ets:match_object(files, {{Fipe, '_'}, '_'}),
+    Files = [File || {{_Fipe, _FileId}, File} <- Objects],
+    Files.
+
 
 delete(File) ->
     ets:delete(files, {fipe(File), id(File)}).
