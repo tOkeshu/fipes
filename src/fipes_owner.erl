@@ -1,4 +1,4 @@
--module(fipes_owners).
+-module(fipes_owner).
 
 -export([find/2, register/3, unregister/2, notify/2]).
 
