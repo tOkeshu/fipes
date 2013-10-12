@@ -9,14 +9,12 @@
                                       {<<".css">>,  [<<"text/css">>]},
                                       {<<".png">>,  [<<"image/png">>]},
                                       {<<".gif">>,  [<<"image/gif">>]}]}]).
--define(ROOT_OPTIONS, [{directory, <<"./public">>},
-                       {file, "index.html"},
-                       {mimetypes, [{<<".html">>, [<<"text/html">>]}]}]).
--define(ROUTES, [{"/fipes/:pipe/files/:file", fipes_files, []},
-                 {"/fipes/:pipe/files",       fipes_files, []},
-                 {"/fipes/:pipe",             fipes_pipe,  []},
-                 {"/fipes",                   fipes_pipe,  []},
-                 {"/stats",                   fipes_stats_api, []},
+-define(ROOT_OPTIONS, ?STATIC_OPTIONS ++ [{file, "index.html"}]).
+-define(ROUTES, [{"/fipes/:pipe/files/:file", fipes_api_files, []},
+                 {"/fipes/:pipe/files",       fipes_api_files, []},
+                 {"/fipes/:pipe",             fipes_api_pipes, []},
+                 {"/fipes",                   fipes_api_pipes, []},
+                 {"/stats",                   fipes_api_stats, []},
                  {"/static/[...]", cowboy_static, ?STATIC_OPTIONS},
                  {"/",             cowboy_static, ?ROOT_OPTIONS}]).
 

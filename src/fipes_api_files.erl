@@ -1,9 +1,6 @@
--module(fipes_files).
+-module(fipes_api_files).
 
 -export([init/3, handle/2, terminate/3]).
--export([to_tnestring_struct/1]).
-
--include("fipes.hrl").
 
 
 init({tcp, http}, Req, []) ->
@@ -31,9 +28,8 @@ dispatch(Req) ->
 
 
 index(Fipe, Req) ->
-    Objects = ets:match_object(files, {{Fipe, '_'}, '_'}),
-    Files   = [to_tnestring_struct(File) ||
-                  {{_Fipe, _FileId}, File} <- Objects],
+    Files   = [fipes_file:to_tnetstring(File) ||
+                  File <- fipes_file:find_by_fipe(Fipe)],
     Results = tnetstrings:encode(Files, [{label, atom}]),
 
     Headers = [{<<"Content-Type">>, <<"application/tnetstrings">>}],
@@ -43,13 +39,13 @@ index(Fipe, Req) ->
 download(Fipe, FileId, Req) ->
     % Register the downloader
     Uid = fipes_utils:token(8),
-    ets:insert(downloaders, {{Fipe, Uid}, self()}),
+    true = fipes_downloader:register(Fipe, Uid, self()),
 
     File = find_file(Fipe, FileId),
 
     Headers =
         [{<<"Content-Type">>, <<"application/octet-stream">>},
-         {<<"Content-Disposition">>, [<<"attachment; filename=\"">>, File#file.name, <<"\"">>]},
+         {<<"Content-Disposition">>, [<<"attachment; filename=\"">>, fipes_file:name(File), <<"\"">>]},
          {<<"Access-Control-Allow-Origin">>, <<"*">>},
          % Tell Nginx to not buffer this response
          % http://wiki.nginx.org/X-accel#X-Accel-Buffering
@@ -57,9 +53,9 @@ download(Fipe, FileId, Req) ->
     {ok, Req2} = cowboy_req:chunked_reply(200, Headers, Req),
 
     % Ask the file owner to start the stream
-    File#file.owner ! {stream, FileId, Uid, 0},
+    fipes_file:owner(File) ! {stream, FileId, Uid, 0},
 
-    fipes_stats:push('average-size', File#file.size),
+    fipes_stats:push('average-size', fipes_file:size(File)),
     fipes_stats:push('total-uploads', 1),
     stream(File, Uid, Req2).
 
@@ -72,25 +68,25 @@ find_file(Fipe, FileId) ->
 stream(File, Uid, Req) ->
     receive
         {chunk, eos} ->
-            ets:delete(downloaders, {File#file.fipe, Uid}),
+            true = fipes_downloader:unregister(fipes_file:fipe(File), Uid),
             {ok, Req};
         {chunk, FirstChunk} ->
             <<SmallChunk:1/binary, NextCurrentChunk/binary>> = FirstChunk,
             send_chunk(SmallChunk, Req),
             NextSeek = size(FirstChunk),
-            File#file.owner ! {stream, File#file.id, Uid, NextSeek},
+            fipes_file:owner(File) ! {stream, fipes_file:id(File), Uid, NextSeek},
             stream(File, Uid, NextCurrentChunk, NextSeek, Req)
     end.
 stream(File, Uid, CurrentChunk, Seek, Req) ->
     receive
         {chunk, eos} ->
             send_chunk(CurrentChunk, Req),
-            ets:delete(downloaders, {File#file.fipe, Uid}),
+            true = fipes_downloader:unregister(fipes_file:fipe(File), Uid),
             {ok, Req};
         {chunk, NextChunk} ->
             send_chunk(CurrentChunk, Req),
             NextSeek = Seek + size(NextChunk),
-            File#file.owner ! {stream, File#file.id, Uid, NextSeek},
+            fipes_file:owner(File) ! {stream, fipes_file:id(File), Uid, NextSeek},
             stream(File, Uid, NextChunk, NextSeek, Req)
     after
         20000 ->
@@ -105,22 +101,15 @@ send_chunk(Chunk, Req) ->
 
 create(Fipe, Req) ->
     File = file_from_req(Fipe, Req),
-    true = ets:insert(files, {{Fipe, File#file.id}, File}),
-    TnetFile = to_tnestring_struct(File),
-    notify(Fipe, TnetFile),
+    true = ets:insert(files, {{Fipe, fipes_file:id(File)}, File}),
+    TNetFile = fipes_file:to_tnetstring(File),
+    fipes_owner:notify(Fipe, {new, TNetFile}),
 
     Headers = [{<<"Content-Type">>, <<"application/tnetstrings">>}],
-    Result  = tnetstrings:encode(TnetFile),
+    Result  = tnetstrings:encode(TNetFile),
     fipes_stats:push('total-files', 1),
     cowboy_req:reply(200, Headers, Result, Req).
 
-
-to_tnestring_struct(File) ->
-    {struct, [{id,    File#file.id},
-              {name,  File#file.name},
-              {type,  File#file.type},
-              {size,  File#file.size},
-              {owner, File#file.owner_id}]}.
 
 file_from_req(Fipe, Req) ->
     FileId = fipes_utils:token(2),
@@ -129,24 +118,14 @@ file_from_req(Fipe, Req) ->
     {struct, FileInfos} = tnetstrings:decode(Body, [{label, atom}]),
 
     Uid = proplists:get_value(owner, FileInfos),
-    [{{Fipe, Uid}, Owner}] = ets:lookup(owners, {Fipe, Uid}),
+    Owner = fipes_owner:find(Fipe, Uid),
 
-    Name = proplists:get_value(name, FileInfos),
-    Type = proplists:get_value(type, FileInfos),
-    Size = proplists:get_value(size, FileInfos),
-    File = #file{id=FileId,
-                 name=Name,
-                 type=Type,
-                 size=Size,
-                 fipe=Fipe,
-                 owner_id=Uid,
-                 owner=Owner},
-    File.
-
-notify(Fipe, File) ->
-    [Owner ! {new, File} ||
-        {{OtherFipe, _Uid}, Owner} <- ets:tab2list(owners), OtherFipe == Fipe],
-    ok.
+    % XXX: There is 2 owner key in this proplist. We use proplist:get_value in
+    % fipe_file:from_proplist so it's fine. But we should rename owner in
+    % owner_id.
+    fipes_file:from_proplist([{id, FileId},
+                              {owner_id, Uid},
+                              {owner, Owner}|FileInfos]).
 
 
 terminate(_Reason, _Req, _State) ->

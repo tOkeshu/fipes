@@ -1,7 +1,6 @@
--module(fipes_stats_api).
+-module(fipes_api_stats).
 
 -export([init/3, handle/2, terminate/3]).
--include("fipes.hrl").
 
 
 init({tcp, http}, Req, []) ->

@@ -1,10 +1,8 @@
--module(fipes_pipe).
+-module(fipes_api_pipes).
 
 -export([init/3, handle/2, terminate/3]).
 -export([websocket_init/3, websocket_handle/3,
          websocket_info/3, websocket_terminate/3]).
-
--include("fipes.hrl").
 
 
 init({tcp, http}, Req, _Opts) ->
@@ -76,7 +74,7 @@ websocket_info({stream, File, Downloader, Seek}, Req, State) ->
                                         ]}),
     {reply, {text, Event}, Req, State, hibernate};
 websocket_info({uid, Uid}, Req, [Fipe, undefined]) ->
-    ets:insert(owners, {{Fipe, Uid}, self()}),
+    true = fipes_owner:register(Fipe, Uid, self()),
     Event = tnetstrings:encode({struct, [{type, <<"uid">>},
                                          {uid, Uid}
                                         ]}),
@@ -93,29 +91,13 @@ websocket_info(_Info, Req, State) ->
     {ok, Req, State, hibernate}.
 
 websocket_terminate(_Reason, _Req, [Fipe, Uid]) ->
-    % Find the user's files
-    Match = #file{id='_',
-                  name='_',
-                  type='_',
-                  size='_',
-                  fipe='_',
-                  owner_id='_',
-                  owner=self()},
-    Files = ets:match_object(files, {{Fipe, '_'}, Match}),
     [begin
-         notify(Fipe, File),
-         ets:delete(files, {Fipe, FileId})
-     end || {{_Fipe, FileId}, File} <- Files],
-    ets:delete(owners, {Fipe, Uid}),
+         TNetFile = fipes_file:to_tnetstring(File),
+         fipes_owner:notify(Fipe, {remove, TNetFile}),
+         fipes_file:delete(File)
+     end || File <- fipes_file:find_by_owner(Uid)],
+    true = fipes_owner:unregister(Fipe, Uid),
     ok.
-
-
-% XXX: duplicated code, see fipes_files:notify/2.
-notify(Fipe, File) ->
-    [Owner ! {remove, fipes_files:to_tnestring_struct(File)} ||
-        {{OtherFipe, _Uid}, Owner} <- ets:tab2list(owners), OtherFipe == Fipe],
-    ok.
-
 
 
 rpc(Fipe, {struct, Event}) ->
@@ -126,11 +108,11 @@ rpc(Fipe, <<"chunk">>, Event) ->
     Payload    = proplists:get_value(payload, Event),
     Uid        = proplists:get_value(downloader, Event),
 
-    [{{Fipe, Uid}, Downloader}] = ets:lookup(downloaders, {Fipe, Uid}),
+    Downloader = fipes_downloader:find(Fipe, Uid),
     Downloader ! {chunk, base64:decode(Payload)};
 rpc(Fipe, <<"eos">>, Event) ->
     Uid = proplists:get_value(downloader, Event),
-    [{{Fipe, Uid}, Downloader}] = ets:lookup(downloaders, {Fipe, Uid}),
+    Downloader = fipes_downloader:find(Fipe, Uid),
     Downloader ! {chunk, eos};
 rpc(_Fipe, _AnyType, _Event) ->
     ok.
