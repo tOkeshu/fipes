@@ -1,13 +1,13 @@
 -module(fipes_pipe).
 
--export([init/3, handle/2, terminate/2]).
+-export([init/3, handle/2, terminate/3]).
 -export([websocket_init/3, websocket_handle/3,
          websocket_info/3, websocket_terminate/3]).
 
 -include("fipes.hrl").
 
 
-init({ssl, http}, Req, _Opts) ->
+init({tcp, http}, Req, _Opts) ->
     case cowboy_req:header(<<"upgrade">>, Req) of
         {undefined, Req2} -> {ok, Req2, []};
         {<<"websocket">>, _Req2} -> {upgrade, protocol, cowboy_websocket};
@@ -48,7 +48,7 @@ create(Req) ->
 
 
 
-terminate(_Req, _State) ->
+terminate(_Reason, _Req, _State) ->
     ok.
 
 %% websockets

@@ -7,7 +7,8 @@
         },
 
         fullUrl: function() {
-            return document.location.protocol + '//' + document.domain + this.url();
+            var l = document.location;
+            return l.protocol + '//' + l.host + this.url();
         },
 
         toJSON: function() {

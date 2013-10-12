@@ -11,27 +11,20 @@ Fipes provides you a simple way to share files with your friends.
 
 ## Getting Started
 
-**ACHTUNG: if you want to hack, you should clone the `develop` branch**. See
-`CONTRIBUTING.md` for more information.
+**ACHTUNG: if you want to hack, you should clone the `develop`
+branch**. See `CONTRIBUTING.md` for more information.
 
 ### Requirements
 
   * [Erlang](http://www.erlang.org/download.html) (R15B or later)
-  * [Rebar](https://github.com/basho/rebar)
-
-You will need `rebar` installed in your `$PATH`.
-
-Please see the [rebar repository](https://github.com/basho/rebar) for
-downloading and building instructions.
 
 ### Install the project
 
     $ git clone https://github.com/tOkeshu/fipes.git
     $ cd fipes
-    $ make app
+    $ make
 
-These commands should pull the Erlang dependencies via Rebar and build
-a release.
+These commands should pull the Erlang dependencies.
 
 ### Configure Nginx
 
@@ -53,7 +46,7 @@ have WebSocket proxying):
             proxy_pass http://127.0.0.1:3473;
         }
 
-        # WebSocket proxying
+        # WebSocket proxying (requires nginx 1.4 or later)
         location ~ /fipes/([^/]+)$ {
             proxy_read_timeout 900;
             proxy_pass http://127.0.0.1:3473/fipes/$1;
@@ -76,7 +69,7 @@ Enable your site:
 ### Start the server
 
     $ cd fipes
-    $ make start # start the server on port 3473
+    $ make start # start the server as a daemon on port 3473
 
 Then open a browser to http://fipes.example.com (where
 `fipes.example.com` is your domain).
@@ -87,7 +80,14 @@ your `/etc/hosts`:
     # /etc/hosts
     127.0.1.1	fipes.example.com
 
+and launch the server with:
+
+    $ make dev
+
 ## Bugs/Pitfalls
+
+  * Fipes is not p2p. However no data is stored on the server
+    **ever**. The data just pass through the server, that's all.
 
   * Reloading the page while you're in a Fipe will stops the browser
     from serving your files. This is normal as the JavaScript File

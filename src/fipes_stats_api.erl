@@ -1,10 +1,10 @@
 -module(fipes_stats_api).
 
--export([init/3, handle/2, terminate/2]).
+-export([init/3, handle/2, terminate/3]).
 -include("fipes.hrl").
 
 
-init({ssl, http}, Req, []) ->
+init({tcp, http}, Req, []) ->
     %% timer:apply_interval(1000, fipes_stats, push, ['total-data-transfer', 3]),
     {ok, Req, []}.
 
@@ -39,7 +39,7 @@ stream(Req) ->
 not_allowed(Req) ->
     {ok, Req}.
 
-terminate(_Req, _State) ->
+terminate(_Reason, _Req, _State) ->
     fipes_stats:unsubscribe(),
     ok.
 
