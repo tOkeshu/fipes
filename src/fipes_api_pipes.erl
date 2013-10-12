@@ -4,8 +4,6 @@
 -export([websocket_init/3, websocket_handle/3,
          websocket_info/3, websocket_terminate/3]).
 
--include("fipes.hrl").
-
 
 init({tcp, http}, Req, _Opts) ->
     case cowboy_req:header(<<"upgrade">>, Req) of
@@ -76,7 +74,7 @@ websocket_info({stream, File, Downloader, Seek}, Req, State) ->
                                         ]}),
     {reply, {text, Event}, Req, State, hibernate};
 websocket_info({uid, Uid}, Req, [Fipe, undefined]) ->
-    ets:insert(owners, {{Fipe, Uid}, self()}),
+    true = fipes_user:register(Fipe, Uid, self()),
     Event = tnetstrings:encode({struct, [{type, <<"uid">>},
                                          {uid, Uid}
                                         ]}),
@@ -93,27 +91,18 @@ websocket_info(_Info, Req, State) ->
     {ok, Req, State, hibernate}.
 
 websocket_terminate(_Reason, _Req, [Fipe, Uid]) ->
-    % Find the user's files
-    Match = #file{id='_',
-                  name='_',
-                  type='_',
-                  size='_',
-                  fipe='_',
-                  owner_id='_',
-                  owner=self()},
-    Files = ets:match_object(files, {{Fipe, '_'}, Match}),
     [begin
          notify(Fipe, File),
-         ets:delete(files, {Fipe, FileId})
-     end || {{_Fipe, FileId}, File} <- Files],
-    ets:delete(owners, {Fipe, Uid}),
+         fipe_file:delete(File)
+     end || File <- fipe_file:find_by_owner(Uid)],
+    ok = fipes_user:unregister(Fipe, Uid),
     ok.
 
 
 % XXX: duplicated code, see fipes_files:notify/2.
 notify(Fipe, File) ->
-    [Owner ! {remove, fipes_files:to_tnestring_struct(File)} ||
-        {{OtherFipe, _Uid}, Owner} <- ets:tab2list(owners), OtherFipe == Fipe],
+    [Owner ! {remove, fipes_file:to_tnestring(File)} ||
+        {{OtherFipe, _Uid}, Owner} <- ets:tab2list(users), OtherFipe == Fipe],
     ok.
 
 
