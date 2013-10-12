@@ -39,7 +39,7 @@ index(Fipe, Req) ->
 download(Fipe, FileId, Req) ->
     % Register the downloader
     Uid = fipes_utils:token(8),
-    ets:insert(downloaders, {{Fipe, Uid}, self()}),
+    true = fipes_downloader:register(Fipe, Uid, self()),
 
     File = find_file(Fipe, FileId),
 
@@ -68,7 +68,7 @@ find_file(Fipe, FileId) ->
 stream(File, Uid, Req) ->
     receive
         {chunk, eos} ->
-            ets:delete(downloaders, {fipes_file:fipe(File), Uid}),
+            true = fipes_downloader:unregister(fipes_file:fipe(File), Uid),
             {ok, Req};
         {chunk, FirstChunk} ->
             <<SmallChunk:1/binary, NextCurrentChunk/binary>> = FirstChunk,
@@ -81,7 +81,7 @@ stream(File, Uid, CurrentChunk, Seek, Req) ->
     receive
         {chunk, eos} ->
             send_chunk(CurrentChunk, Req),
-            ets:delete(downloaders, {fipes_file:fipe(File), Uid}),
+            true = fipes_downloader:unregister(fipes_file:fipe(File), Uid),
             {ok, Req};
         {chunk, NextChunk} ->
             send_chunk(CurrentChunk, Req),

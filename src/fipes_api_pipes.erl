@@ -108,11 +108,11 @@ rpc(Fipe, <<"chunk">>, Event) ->
     Payload    = proplists:get_value(payload, Event),
     Uid        = proplists:get_value(downloader, Event),
 
-    [{{Fipe, Uid}, Downloader}] = ets:lookup(downloaders, {Fipe, Uid}),
+    Downloader = fipes_downloader:find(Fipe, Uid),
     Downloader ! {chunk, base64:decode(Payload)};
 rpc(Fipe, <<"eos">>, Event) ->
     Uid = proplists:get_value(downloader, Event),
-    [{{Fipe, Uid}, Downloader}] = ets:lookup(downloaders, {Fipe, Uid}),
+    Downloader = fipes_downloader:find(Fipe, Uid),
     Downloader ! {chunk, eos};
 rpc(_Fipe, _AnyType, _Event) ->
     ok.
