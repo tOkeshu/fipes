@@ -96,7 +96,7 @@ websocket_terminate(_Reason, _Req, [Fipe, Uid]) ->
          fipes_owners:notify(Fipe, {remove, TNetFile}),
          fipes_file:delete(File)
      end || File <- fipes_file:find_by_owner(Uid)],
-    ok = fipes_user:unregister(Fipe, Uid),
+    true = fipes_user:unregister(Fipe, Uid),
     ok.
 
 
