@@ -92,19 +92,12 @@ websocket_info(_Info, Req, State) ->
 
 websocket_terminate(_Reason, _Req, [Fipe, Uid]) ->
     [begin
-         notify(Fipe, File),
-         fipe_file:delete(File)
-     end || File <- fipe_file:find_by_owner(Uid)],
+         TNetFile = fipes_file:to_tnetstring(File),
+         fipes_owners:notify(Fipe, {remove, TNetFile}),
+         fipes_file:delete(File)
+     end || File <- fipes_file:find_by_owner(Uid)],
     ok = fipes_user:unregister(Fipe, Uid),
     ok.
-
-
-% XXX: duplicated code, see fipes_files:notify/2.
-notify(Fipe, File) ->
-    [Owner ! {remove, fipes_file:to_tnestring(File)} ||
-        {{OtherFipe, _Uid}, Owner} <- ets:tab2list(users), OtherFipe == Fipe],
-    ok.
-
 
 
 rpc(Fipe, {struct, Event}) ->

@@ -102,11 +102,11 @@ send_chunk(Chunk, Req) ->
 create(Fipe, Req) ->
     File = file_from_req(Fipe, Req),
     true = ets:insert(files, {{Fipe, fipes_file:id(File)}, File}),
-    TnetFile = fipes_file:to_tnetstring(File),
-    notify(Fipe, TnetFile),
+    TNetFile = fipes_file:to_tnetstring(File),
+    fipes_owners:notify(Fipe, {new, TNetFile}),
 
     Headers = [{<<"Content-Type">>, <<"application/tnetstrings">>}],
-    Result  = tnetstrings:encode(TnetFile),
+    Result  = tnetstrings:encode(TNetFile),
     fipes_stats:push('total-files', 1),
     cowboy_req:reply(200, Headers, Result, Req).
 
@@ -126,11 +126,6 @@ file_from_req(Fipe, Req) ->
     fipes_file:from_proplist([{id, FileId},
                               {owner_id, Uid},
                               {owner, Owner}|FileInfos]).
-
-notify(Fipe, File) ->
-    [Owner ! {new, File} ||
-        {{OtherFipe, _Uid}, Owner} <- ets:tab2list(users), OtherFipe == Fipe],
-    ok.
 
 
 terminate(_Reason, _Req, _State) ->
