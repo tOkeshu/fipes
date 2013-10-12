@@ -1,4 +1,4 @@
--module(fipes_pipe).
+-module(fipes_api_pipes).
 
 -export([init/3, handle/2, terminate/3]).
 -export([websocket_init/3, websocket_handle/3,

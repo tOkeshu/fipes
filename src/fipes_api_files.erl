@@ -1,4 +1,4 @@
--module(fipes_files).
+-module(fipes_api_files).
 
 -export([init/3, handle/2, terminate/3]).
 -export([to_tnestring_struct/1]).
