@@ -74,7 +74,7 @@ websocket_info({stream, File, Downloader, Seek}, Req, State) ->
                                         ]}),
     {reply, {text, Event}, Req, State, hibernate};
 websocket_info({uid, Uid}, Req, [Fipe, undefined]) ->
-    true = fipes_user:register(Fipe, Uid, self()),
+    true = fipes_owners:register(Fipe, Uid, self()),
     Event = tnetstrings:encode({struct, [{type, <<"uid">>},
                                          {uid, Uid}
                                         ]}),
@@ -96,7 +96,7 @@ websocket_terminate(_Reason, _Req, [Fipe, Uid]) ->
          fipes_owners:notify(Fipe, {remove, TNetFile}),
          fipes_file:delete(File)
      end || File <- fipes_file:find_by_owner(Uid)],
-    true = fipes_user:unregister(Fipe, Uid),
+    true = fipes_owners:unregister(Fipe, Uid),
     ok.
 
 

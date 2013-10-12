@@ -118,7 +118,7 @@ file_from_req(Fipe, Req) ->
     {struct, FileInfos} = tnetstrings:decode(Body, [{label, atom}]),
 
     Uid = proplists:get_value(owner, FileInfos),
-    Owner = fipes_user:find(Fipe, Uid),
+    Owner = fipes_owners:find(Fipe, Uid),
 
     % XXX: There is 2 owner key in this proplist. We use proplist:get_value in
     % fipe_file:from_proplist so it's fine. But we should rename owner in
