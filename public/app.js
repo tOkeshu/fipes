@@ -61,13 +61,17 @@ App.Helpers = {
     //
     //   http://programanddesign.com/js/human-readable-file-size-in-javascript/
     //
-    humanSize: function(size) {
+    humanSize: function(size, cap) {
         var units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         var i = 0;
         while(size >= 1024) {
+            if (units.indexOf(cap) === i)
+                break;
+
             size /= 1024;
             ++i;
         }
+
         return size.toFixed(1) + ' ' + units[i];
     }
 
@@ -87,7 +91,9 @@ $(document).ready(function() {
     function dispatch(event) {
         var tdt = document.querySelector('.' + event.type);
         var data = event.data
-        if (event.type == 'total-data' || event.type == 'average-size')
+        if (event.type == 'total-data')
+            data = App.Helpers.humanSize(parseInt(event.data), "MB")
+        if (event.type == 'average-size')
             data = App.Helpers.humanSize(parseInt(event.data))
 
         tdt.textContent = data;
