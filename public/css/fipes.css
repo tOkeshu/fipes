@@ -1,5 +1,12 @@
 /* Fipes.css */
 
+@font-face {
+  font-family: 'Ruluko';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Ruluko'), url(/static/css/ruluko.woff) format('woff');
+}
+
 a {
   text-decoration: none;
 }
