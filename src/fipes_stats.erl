@@ -24,7 +24,7 @@ push(Type, N) ->
 
 init(_Args) ->
     Stats =
-        case file:consult("fipes/priv/stats") of
+        case file:consult("priv/stats") of
             {error, _} ->
                 [{'total-data', 0},
                  {'total-files', 0},
@@ -81,5 +81,5 @@ code_change(_OldVsn, State, _Extra) ->
 
 
 save(State) ->
-    file:write_file("fipes/priv/stats", io_lib:fwrite("~p.\n", [State])).
+    file:write_file("priv/stats", io_lib:fwrite("~p.\n", [State])).
 
