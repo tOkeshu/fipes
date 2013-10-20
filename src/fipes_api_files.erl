@@ -43,21 +43,23 @@ download(Fipe, FileId, Req) ->
 
     File = find_file(Fipe, FileId),
 
-    Headers =
-        [{<<"Content-Type">>, <<"application/octet-stream">>},
-         {<<"Content-Disposition">>, [<<"attachment; filename=\"">>, fipes_file:name(File), <<"\"">>]},
-         {<<"Access-Control-Allow-Origin">>, <<"*">>},
-         % Tell Nginx to not buffer this response
-         % http://wiki.nginx.org/X-accel#X-Accel-Buffering
-         {<<"X-Accel-Buffering">>, <<"no">>}],
-    {ok, Req2} = cowboy_req:chunked_reply(200, Headers, Req),
-
     % Ask the file owner to start the stream
     fipes_file:owner(File) ! {stream, FileId, Uid, 0},
 
     fipes_stats:push('average-size', fipes_file:size(File)),
     fipes_stats:push('total-uploads', 1),
-    stream(File, Uid, Req2).
+
+    BodyFun =
+        fun(Socket, Transport) -> stream(File, Uid, Socket, Transport) end,
+    Req2 = cowboy_req:set_resp_body_fun(fipes_file:size(File), BodyFun, Req),
+    Headers =
+        [{<<"Content-Type">>, fipes_file:type(File)},
+         {<<"Content-Disposition">>, [<<"inline; filename=\"">>, fipes_file:name(File), <<"\"">>]},
+         {<<"Access-Control-Allow-Origin">>, <<"*">>},
+         % Tell Nginx to not buffer this response
+         % http://wiki.nginx.org/X-accel#X-Accel-Buffering
+         {<<"X-Accel-Buffering">>, <<"no">>}],
+    cowboy_req:reply(200, Headers, Req2).
 
 
 find_file(Fipe, FileId) ->
@@ -65,39 +67,41 @@ find_file(Fipe, FileId) ->
     File.
 
 
-stream(File, Uid, Req) ->
+stream(File, Uid, Socket, Transport) ->
     receive
         {chunk, eos} ->
+            Transport:close(Socket),
             true = fipes_downloader:unregister(fipes_file:fipe(File), Uid),
-            {ok, Req};
+            ok;
         {chunk, FirstChunk} ->
             <<SmallChunk:1/binary, NextCurrentChunk/binary>> = FirstChunk,
-            send_chunk(SmallChunk, Req),
+            send_chunk(SmallChunk, Socket, Transport),
             NextSeek = size(FirstChunk),
             fipes_file:owner(File) ! {stream, fipes_file:id(File), Uid, NextSeek},
-            stream(File, Uid, NextCurrentChunk, NextSeek, Req)
+            stream(File, Uid, NextCurrentChunk, NextSeek, Socket, Transport)
     end.
-stream(File, Uid, CurrentChunk, Seek, Req) ->
+stream(File, Uid, CurrentChunk, Seek, Socket, Transport) ->
     receive
         {chunk, eos} ->
-            send_chunk(CurrentChunk, Req),
+            send_chunk(CurrentChunk, Socket, Transport),
+            Transport:close(Socket),
             true = fipes_downloader:unregister(fipes_file:fipe(File), Uid),
-            {ok, Req};
+            ok;
         {chunk, NextChunk} ->
-            send_chunk(CurrentChunk, Req),
+            send_chunk(CurrentChunk, Socket, Transport),
             NextSeek = Seek + size(NextChunk),
             fipes_file:owner(File) ! {stream, fipes_file:id(File), Uid, NextSeek},
-            stream(File, Uid, NextChunk, NextSeek, Req)
+            stream(File, Uid, NextChunk, NextSeek, Socket, Transport)
     after
         20000 ->
             <<SmallChunk:1/binary, NexCurrentChunk/binary>> = CurrentChunk,
-            send_chunk(SmallChunk, Req),
-            stream(File, Uid, NexCurrentChunk, Seek, Req)
+            send_chunk(SmallChunk, Socket, Transport),
+            stream(File, Uid, NexCurrentChunk, Seek, Socket, Transport)
     end.
 
-send_chunk(Chunk, Req) ->
+send_chunk(Chunk, Socket, Transport) ->
     fipes_stats:push('total-data', size(Chunk)),
-    cowboy_req:chunk(Chunk, Req).
+    Transport:send(Socket, Chunk).
 
 create(Fipe, Req) ->
     File = file_from_req(Fipe, Req),
