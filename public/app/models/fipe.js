@@ -4,7 +4,8 @@
         urlRoot: '/fipes',
 
         open: function(callback) {
-            var uri = "ws://" + location.host + this.url();
+            var protocol = (location.protocol === "https:") ? "wss:" : "ws:";
+            var uri = protocol + "//" + location.host + this.url();
 
             if ("MozWebSocket" in window) {
                 WebSocket = MozWebSocket;
