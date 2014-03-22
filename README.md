@@ -31,15 +31,24 @@ These commands should pull the Erlang dependencies.
 Here is a sample configuration for nginx (you will need **nginx 1.4** or later to
 have WebSocket proxying):
 
+
     # /etc/nginx/sites-available/fipes.example.com
     server {
-        listen   80;
+        listen 80;
+        # Or the line below if you want https
+        # listen 443 ssl;
 
         root /path/to/fipes/public;
         index index.html index.htm;
 
         server_name fipes.example.com;
         server_name_in_redirect off;
+
+        # Uncomment the lines below if you want https
+        # ssl_certificate     /path/to/fipes.crt;
+        # ssl_certificate_key /path/to/fipe.key;
+        # ssl_protocols       SSLv3 TLSv1 TLSv1.1 TLSv1.2;
+        # ssl_ciphers         HIGH;
 
         location / {
             proxy_read_timeout 900;
@@ -49,9 +58,12 @@ have WebSocket proxying):
         # WebSocket proxying (requires nginx 1.4 or later)
         location ~ /fipes/([^/]+)$ {
             proxy_read_timeout 900;
+
+            proxy_http_version 1.1;
             proxy_pass http://127.0.0.1:3473/fipes/$1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
         }
 
         # Uncomment the lines below if you want to launch the js tests
