@@ -3,25 +3,19 @@
 
 -export([start/0, shutdown/1, start/2, stop/1]).
 
--define(STATIC_OPTIONS, [{directory, <<"./public">>},
-                         {mimetypes, [{<<".html">>, [<<"text/html">>]},
-                                      {<<".js">>,   [<<"application/javascript">>]},
-                                      {<<".css">>,  [<<"text/css">>]},
-                                      {<<".png">>,  [<<"image/png">>]},
-                                      {<<".gif">>,  [<<"image/gif">>]}]}]).
--define(ROOT_OPTIONS, ?STATIC_OPTIONS ++ [{file, "index.html"}]).
 -define(ROUTES, [{"/fipes/:pipe/files/:file", fipes_api_files, []},
                  {"/fipes/:pipe/files",       fipes_api_files, []},
                  {"/fipes/:pipe",             fipes_api_pipes, []},
                  {"/fipes",                   fipes_api_pipes, []},
                  {"/stats",                   fipes_api_stats, []},
-                 {"/static/[...]", cowboy_static, ?STATIC_OPTIONS},
-                 {"/",             cowboy_static, ?ROOT_OPTIONS}]).
+                 {"/static/[...]", cowboy_static, {dir,  "./public"}},
+                 {"/",             cowboy_static, {file, "./public/index.html"}}]).
 
 
 start() ->
     ok = application:start(crypto),
     ok = application:start(ranch),
+    ok = application:start(cowlib),
     ok = application:start(cowboy),
     ok = application:start(fipes),
     ok.
