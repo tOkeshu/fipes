@@ -46,7 +46,7 @@ have WebSocket proxying):
 
         # Uncomment the lines below if you want https
         # ssl_certificate     /path/to/fipes.crt;
-        # ssl_certificate_key /path/to/fipe.key;
+        # ssl_certificate_key /path/to/fipes.key;
         # ssl_protocols       SSLv3 TLSv1 TLSv1.1 TLSv1.2;
         # ssl_ciphers         HIGH;
 
@@ -78,6 +78,15 @@ have WebSocket proxying):
         #     proxy_pass http://127.0.0.1:3473/tests.html;
         # }
     }
+
+    # You may want to uncomment the lines below to always redirect
+    # http to https
+    # server {
+    #     listen 80;
+    #     server_name fipes.example.com;
+    #     # Redirect http to https
+    #     rewrite ^ https://$server_name$request_uri? permanent;
+    # }
 
 Enable your site:
 
