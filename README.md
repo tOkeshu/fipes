@@ -55,6 +55,12 @@ have WebSocket proxying):
             proxy_pass http://127.0.0.1:3473;
         }
 
+        # We need to turn off the buffering for Server-Sent Events
+        location /stats {
+            proxy_buffering off;
+            proxy_pass http://127.0.0.1:3473/stats;
+        }
+
         # WebSocket proxying (requires nginx 1.4 or later)
         location ~ /fipes/([^/]+)$ {
             proxy_read_timeout 900;
