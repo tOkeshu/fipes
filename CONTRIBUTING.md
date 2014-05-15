@@ -16,11 +16,9 @@ However, before sending a patch, please make sure that the following applies:
 
 The project use a fairly simple model of branches:
 
-* `master` is the "stable" version. In other words, anyone should be
-  able to clone the master branch and have a running application in a minute.
-  This branch should never be broken.
-* `develop` is the "trunk" version. By definition this branch is fairly
-  instable and can be broken. This is where people want to hack.
+* `master` is the "trunk" version. By definition this branch can be
+  broken. This is from where people want to hack.
+* Check the last recent tags for a stable version
 
 Topic branches should be used as much as possible.
 

@@ -11,9 +11,6 @@ Fipes provides you a simple way to share files with your friends.
 
 ## Getting Started
 
-**ACHTUNG: if you want to hack, you should clone the `develop`
-branch**. See `CONTRIBUTING.md` for more information.
-
 ### Requirements
 
   * [Erlang](http://www.erlang.org/download.html) (R15B or later)
@@ -22,6 +19,7 @@ branch**. See `CONTRIBUTING.md` for more information.
 
     $ git clone https://github.com/tOkeshu/fipes.git
     $ cd fipes
+    $ git checkout -b stable v0.1.0 # last stable version
     $ make
 
 These commands should pull the Erlang dependencies.

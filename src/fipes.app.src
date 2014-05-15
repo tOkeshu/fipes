@@ -1,6 +1,6 @@
 {application, fipes, [
 	{description, "Fipes, plumbings to share files."},
-	{vsn, "0.0.1"},
+	{vsn, "0.1.0"},
 	{modules, []},
 	{registered, [fipes_sup]},
 	{applications, [
