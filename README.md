@@ -11,35 +11,32 @@ Fipes provides you a simple way to share files with your friends.
 
 ## Getting Started
 
-**ACHTUNG: if you want to hack, you should clone the `develop` branch**. See
-`CONTRIBUTING.md` for more information.
+**ACHTUNG: if you want to hack, you should clone the `develop`
+branch**. See `CONTRIBUTING.md` for more information.
 
 ### Requirements
 
   * [Erlang](http://www.erlang.org/download.html) (R15B or later)
-  * [Rebar](https://github.com/basho/rebar)
-
-You will need `rebar` installed in your `$PATH`.
-
-Please see the [rebar repository](https://github.com/basho/rebar) for
-downloading and building instructions.
 
 ### Install the project
 
     $ git clone https://github.com/tOkeshu/fipes.git
     $ cd fipes
-    $ make app
+    $ make
 
-These commands should pull the Erlang dependencies via Rebar and build
-a release.
+These commands should pull the Erlang dependencies.
 
 ### Configure Nginx
 
-Here is a sample configuration for nginx:
+Here is a sample configuration for nginx (you will need **nginx 1.4** or later to
+have WebSocket proxying):
+
 
     # /etc/nginx/sites-available/fipes.example.com
     server {
-        listen   80;
+        listen 80;
+        # Or the line below if you want https
+        # listen 443 ssl;
 
         root /path/to/fipes/public;
         index index.html index.htm;
@@ -47,19 +44,49 @@ Here is a sample configuration for nginx:
         server_name fipes.example.com;
         server_name_in_redirect off;
 
+        # Uncomment the lines below if you want https
+        # ssl_certificate     /path/to/fipes.crt;
+        # ssl_certificate_key /path/to/fipes.key;
+        # ssl_protocols       SSLv3 TLSv1 TLSv1.1 TLSv1.2;
+        # ssl_ciphers         HIGH;
+
         location / {
-               proxy_pass http://127.0.0.1:3473/index.html;
+            proxy_read_timeout 900;
+            proxy_pass http://127.0.0.1:3473;
         }
 
-        location /fipes {
-               proxy_pass http://127.0.0.1:3473/fipes;
-               proxy_read_timeout 900;
+        # We need to turn off the buffering for Server-Sent Events
+        location /stats {
+            proxy_buffering off;
+            proxy_pass http://127.0.0.1:3473/stats;
         }
 
-        location /static/ {
-               proxy_pass http://127.0.0.1:3473/static/;
+        # WebSocket proxying (requires nginx 1.4 or later)
+        location ~ /fipes/([^/]+)$ {
+            proxy_read_timeout 900;
+
+            proxy_http_version 1.1;
+            proxy_pass http://127.0.0.1:3473/fipes/$1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
         }
+
+        # Uncomment the lines below if you want to launch the js tests
+        #
+        # location /tests/ {
+        #     proxy_pass http://127.0.0.1:3473/tests.html;
+        # }
     }
+
+    # You may want to uncomment the lines below to always redirect
+    # http to https
+    # server {
+    #     listen 80;
+    #     server_name fipes.example.com;
+    #     # Redirect http to https
+    #     rewrite ^ https://$server_name$request_uri? permanent;
+    # }
 
 Enable your site:
 
@@ -69,7 +96,7 @@ Enable your site:
 ### Start the server
 
     $ cd fipes
-    $ ./rel/fipes/bin/fipes start # start the server on port 3473
+    $ make start # start the server as a daemon on port 3473
 
 Then open a browser to http://fipes.example.com (where
 `fipes.example.com` is your domain).
@@ -80,11 +107,14 @@ your `/etc/hosts`:
     # /etc/hosts
     127.0.1.1	fipes.example.com
 
+and launch the server with:
+
+    $ make dev
+
 ## Bugs/Pitfalls
 
-  * For now, Fipes can't be used without Nginx proxying the application on
-    port 3473 (as shown in the sample file). Any other configuration will
-    probably fail.
+  * Fipes is not p2p. However no data is stored on the server
+    **ever**. The data just pass through the server, that's all.
 
   * Reloading the page while you're in a Fipe will stops the browser
     from serving your files. This is normal as the JavaScript File

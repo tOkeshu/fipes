@@ -1,19 +1,17 @@
-REBAR = ./rebar
+PROJECT = fipes
 
-all: compile
+DEPS = cowboy tnetstrings
+dep_cowboy = https://github.com/extend/cowboy.git 0.9.0
+dep_tnetstrings = https://github.com/tOkeshu/tnetstrings.git tmp/fipes
 
-app: compile
-	@$(REBAR) generate force=1
+include erlang.mk
 
-compile:
-	@$(REBAR) get-deps compile
+start:
+	erl -sname fipes@localhost -pa ebin -pa deps/*/ebin -boot start_sasl -s fipes -detached
 
-tests: compile
-	@$(REBAR) eunit
+dev:
+	erl -sname fipes@localhost -pa ebin -pa deps/*/ebin -boot start_sasl -s fipes
 
-clean:
-	@$(REBAR) clean
-	rm -f erl_crash.dump
-
-dist-clean: clean
+stop:
+	erl -sname fipectl@localhost -pa ebin -pa deps/*/ebin -eval "fipes:shutdown(fipes@localhost)" -s init stop -detached
 

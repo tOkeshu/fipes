@@ -1,0 +1,13 @@
+{application, fipes, [
+	{description, "Fipes, plumbings to share files."},
+	{vsn, "0.0.1"},
+	{modules, []},
+	{registered, [fipes_sup]},
+	{applications, [
+		kernel,
+		stdlib,
+		cowboy
+	]},
+	{mod, {fipes, []}},
+	{env, [{port, 3473}]}
+]}.
