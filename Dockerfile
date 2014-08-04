@@ -6,6 +6,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update
 RUN apt-get -q install -y erlang make git wget
+RUN apt-get clean
 
 RUN useradd -d /opt/fipes fipes
 
