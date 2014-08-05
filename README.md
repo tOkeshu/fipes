@@ -119,7 +119,7 @@ Build the image :
 
 Run the service :
 
-    docker run -t -d -u fipes -p 3473:3473 fipes
+    docker run -t -d -p 3473:3473 fipes
 
 Now, the service run on the port 3473, you should plug it to something wich handle SNI and Websocket, like Nginx or HAproxy.
 
