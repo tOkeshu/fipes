@@ -109,6 +109,20 @@ and launch the server with:
 
     $ make dev
 
+### Docker
+
+The fipes service can be handle by docker.
+
+Build the image :
+
+    docker build -t fipes .
+
+Run the service :
+
+    docker run -t -d -p 3473:3473 fipes
+
+Now, the service run on the port 3473, you should plug it to something wich handle SNI and Websocket, like Nginx or HAproxy.
+
 ## Bugs/Pitfalls
 
   * Fipes is not p2p. However no data is stored on the server
